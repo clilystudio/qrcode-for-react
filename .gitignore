@@ -1,17 +1,17 @@
-# OSX
-**/.DS_Store
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# misc
 .DS_Store
-*.swp
-*~.nib
-
-# Thumbnails
-._*
-
-# Windows image file caches
 Thumbs.db
-
-# Windows Folder config file
 Desktop.ini
+
+# dotenv environment variables file
+.env
+.env.test
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Logs
 logs
@@ -19,7 +19,6 @@ logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-lerna-debug.log*
 
 # Runtime data
 pids
@@ -27,18 +26,10 @@ pids
 *.seed
 *.pid.lock
 
-# Coverage directory used by tools like istanbul
-coverage
-*.lcov
-
-# Dependency directories
-node_modules/
-
-# TypeScript v1 declaration files
-typings/
-
-# TypeScript cache
-*.tsbuildinfo
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
 
 # Optional npm cache directory
 .npm
@@ -52,9 +43,12 @@ typings/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variables file
-.env
-.env.test
-
 # VS Code Settings
 .vscode/
+
+# testing
+coverage
+*.lcov
+
+# production
+/build
