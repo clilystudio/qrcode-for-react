@@ -1,2 +1,3 @@
-# qrcode-for-react
-QR Code generator for React
+# QR Code React components
+
+QR Code React components
