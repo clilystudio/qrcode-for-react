@@ -1,5 +1,6 @@
-import logo from './logo.svg';
 import './App.css';
+import { QRCodeCanvas, QRCodeSVG } from './lib';
+import logo from './logo.svg';
 
 function App() {
   return (
@@ -17,6 +18,8 @@ function App() {
         >
           Learn React
         </a>
+      <QRCodeCanvas data={'QRCodeCanvas'} />
+      <QRCodeSVG data={'QRCodeSVG'} />
       </header>
     </div>
   );
