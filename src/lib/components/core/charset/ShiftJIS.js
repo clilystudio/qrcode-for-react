@@ -6,7 +6,9 @@
   https://opensource.org/licenses/MIT.
 */
 
-const SJIS_ARRAT = [
+// UTF-16BE to Shift JIS Char Code Mapping
+// http://ftp.unicode.org/Public/MAPPINGS/OBSOLETE/EASTASIA/JIS/SHIFTJIS.TXT
+const MAPPING_ARRAY = [
   {charCode: 0x00a2, sjis: 0x8191},
   {charCode: 0x00a3, sjis: 0x8192},
   {charCode: 0x00a5, sjis: 0x5c},
@@ -6898,15 +6900,21 @@ const SJIS_ARRAT = [
 ];
 
 function getByte(charCode) {
-  let len = SJIS_ARRAT.length;
+  let len = MAPPING_ARRAY.length;
+  if (charCode < MAPPING_ARRAY[0].charCode || charCode > MAPPING_ARRAY[len - 1].charCode) {
+    return undefined;
+  }
   for (let i = 0; i < len; i++) {
-    if (charCode === SJIS_ARRAT[i].charCode) {
-      return SJIS_ARRAT[i].sjis;
+    if (charCode === MAPPING_ARRAY[i].charCode) {
+      return MAPPING_ARRAY[i].sjis;
     }
   }
   return undefined;
 }
 
+/**
+ * Convert String to Shift JIS
+ */
 const SJIS = {
   convert: function(data) {
     const bytes = [];
@@ -6915,6 +6923,8 @@ const SJIS = {
       let charCode = data.charCodeAt(i);
       if (charCode < 0x80) {
         bytes.push(charCode);
+      } else if (charCode >= 0xff61 && charCode <= 0xff9f) {
+        bytes.push(charCode - 0xfec0);
       } else {
         let byte = getByte(charCode);
         if (byte) {

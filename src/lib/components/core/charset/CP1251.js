@@ -6,8 +6,9 @@
   https://opensource.org/licenses/MIT.
 */
 
+// UTF-16BE to Code Page 1251 Char Code Mapping
 // http://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP1251.TXT
-const CP1251_ARRAY = [
+const MAPPING_ARRAY = [
   {charCode: 0x00a0, byte: 0xa0},
   {charCode: 0x00a4, byte: 0xa4},
   {charCode: 0x00a6, byte: 0xa6},
@@ -74,15 +75,21 @@ const CP1251_ARRAY = [
 ];
 
 function getByte(charCode) {
-  let len = CP1251_ARRAY.length;
+  let len = MAPPING_ARRAY.length;
+  if (charCode < MAPPING_ARRAY[0].charCode || charCode > MAPPING_ARRAY[len - 1].charCode) {
+    return undefined;
+  }
   for (let i = 0; i < len; i++) {
-    if (charCode === CP1251_ARRAY[i].charCode) {
-      return CP1251_ARRAY[i].byte;
+    if (charCode === MAPPING_ARRAY[i].charCode) {
+      return MAPPING_ARRAY[i].byte;
     }
   }
   return undefined;
 }
 
+/**
+ * Convert String to Code Page 1251
+ */
 const CP1251 = {
   covert: function(data) {
     const bytes = [];
@@ -98,7 +105,7 @@ const CP1251 = {
         if (byte) {
           bytes.push(charCode);
         } else {
-          throw Error('Invalid character!');
+          throw Error('Invalid character! Char Code: ' + charCode.toString(16));
         }
       }
     }

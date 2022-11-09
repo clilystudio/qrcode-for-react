@@ -6,8 +6,9 @@
   https://opensource.org/licenses/MIT.
 */
 
+// UTF-16BE to Code Page 1250 Char Code Mapping
 // http://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP1250.TXT
-const CP1250_ARRAY = [
+const MAPPING_ARRAY = [
   {charCode: 0x00a0, byte: 0xa0},
   {charCode: 0x00a4, byte: 0xa4},
   {charCode: 0x00a6, byte: 0xa6},
@@ -134,15 +135,21 @@ const CP1250_ARRAY = [
 ];
 
 function getByte(charCode) {
-  let len = CP1250_ARRAY.length;
+  let len = MAPPING_ARRAY.length;
+  if (charCode < MAPPING_ARRAY[0] || charCode > MAPPING_ARRAY[len - 1]) {
+    return undefined;
+  }
   for (let i = 0; i < len; i++) {
-    if (charCode === CP1250_ARRAY[i].charCode) {
-      return CP1250_ARRAY[i].byte;
+    if (charCode === MAPPING_ARRAY[i].charCode) {
+      return MAPPING_ARRAY[i].byte;
     }
   }
   return undefined;
 }
 
+/**
+ * Convert String to Code Page 1250
+ */
 const CP1250 = {
   covert: function(data) {
     const bytes = [];
@@ -151,12 +158,14 @@ const CP1250 = {
       let charCode = data.charCodeAt(i);
       if (charCode < 0x80) {
         bytes.push(charCode);
+      } else if (charCode < 0xa0 || charCode > 0x2122) {
+        throw Error('Invalid character! Char Code: ' + charCode.toString(16));
       } else {
         let byte = getByte(charCode);
         if (byte) {
           bytes.push(charCode);
         } else {
-          throw Error('Invalid character!');
+          throw Error('Invalid character! Char Code: ' + charCode.toString(16));
         }
       }
     }

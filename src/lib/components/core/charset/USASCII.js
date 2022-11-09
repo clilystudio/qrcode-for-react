@@ -7,24 +7,22 @@
 */
 
 /**
- * Convert String to UTF-16BE
+ * Convert String to US ASCII
  */
-const UTF16BE = {
-  convert: function(data) {
+const USASCII = {
+  covert: function(data) {
     const bytes = [];
     const len = data.length;
     for (let i = 0; i < len; i++) {
       let charCode = data.charCodeAt(i);
-      if (charCode <= 0xff) {
-        bytes.push(0x00);
+      if (charCode < 0x80) {
         bytes.push(charCode);
       } else {
-        bytes.push(charCode >> 8);
-        bytes.push(charCode & 0xff);
+        throw Error('Invalid character! Char Code: ' + charCode.toString(16));
       }
     }
     return bytes;
-  },
+  }
 };
 
-export default UTF16BE;
+export default USASCII;

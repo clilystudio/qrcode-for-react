@@ -6,6 +6,7 @@
   https://opensource.org/licenses/MIT.
 */
 
+// UTF-16BE to ISO/IEC 8859 Char Code Mapping (including subset 1 to 16)
 // http://ftp.unicode.org/Public/MAPPINGS/ISO8859/
 const ISO_8859_2 = [
   {charCode: 0x00a4, byte: 0xa4},
@@ -1280,7 +1281,7 @@ const ISO_8859_16 = [
   {charCode: 0x20ac, byte: 0xa4},
 ];
 
-const ISO_8859_ARRAY = [
+const MAPPING_ARRAY = [
   ISO_8859_2, ISO_8859_3, ISO_8859_4, ISO_8859_5,
   ISO_8859_6, ISO_8859_7, ISO_8859_8, ISO_8859_9,
   ISO_8859_10, ISO_8859_11, ISO_8859_13, ISO_8859_14,
@@ -1292,16 +1293,22 @@ function getByte(charCode, subset) {
   if (subset > 10) {
     index--;
   }
-  let len = ISO_8859_ARRAY[index].length;
+  let len = MAPPING_ARRAY[index].length;
+  if (charCode < MAPPING_ARRAY[index][0].charCode || charCode > MAPPING_ARRAY[index][len - 1].charCode) {
+    return undefined;
+  }
   for (let i = 0; i < len; i++) {
-    if (charCode === ISO_8859_ARRAY[index][i].charCode) {
-      return ISO_8859_ARRAY[index][i].byte;
+    if (charCode === MAPPING_ARRAY[index][i].charCode) {
+      return MAPPING_ARRAY[index][i].byte;
     }
   }
   return undefined;
 }
 
-const ISO_8859 = {
+/**
+ * Convert String to ISO/IEC 8859
+ */
+ const ISO_8859 = {
   covert: function(data, subset) {
     if (subset < 1 || subset > 16 || subset === 12) {
       throw Error('Invalid subset: ' + subset);
@@ -1314,7 +1321,7 @@ const ISO_8859 = {
         if (charCode <= 0xff) {
           bytes.push(charCode);
         } else {
-          throw Error('Invalid character!');
+          throw Error('Invalid character! Char Code: ' + charCode.toString(16));
         }
       }
     } else {
@@ -1327,7 +1334,7 @@ const ISO_8859 = {
           if (byte) {
             bytes.push(charCode);
           } else {
-            throw Error('Invalid character!');
+            throw Error('Invalid character! Char Code: ' + charCode.toString(16));
           }
         }
       }

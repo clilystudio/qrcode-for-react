@@ -6,9 +6,9 @@
   https://opensource.org/licenses/MIT.
 */
 
+// UTF-16BE to Code Page 437 Char Code Mapping
 // https://www.ibm.com/docs/en/db2/11.5?topic=tables-code-page-437-generic-system-437
-const CP437_ARRAY = [
-  {charCode: 0x007f, byte: 0x1c},
+const MAPPING_ARRAY = [
   {charCode: 0x00a0, byte: 0xff},
   {charCode: 0x00a1, byte: 0xad},
   {charCode: 0x00a2, byte: 0x9b},
@@ -140,15 +140,21 @@ const CP437_ARRAY = [
 ];
 
 function getByte(charCode) {
-  let len = CP437_ARRAY.length;
+  let len = MAPPING_ARRAY.length;
+  if (charCode < MAPPING_ARRAY[0].charCode || charCode > MAPPING_ARRAY[len - 1].charCode) {
+    return undefined;
+  }
   for (let i = 0; i < len; i++) {
-    if (charCode === CP437_ARRAY[i].charCode) {
-      return CP437_ARRAY[i].byte;
+    if (charCode === MAPPING_ARRAY[i].charCode) {
+      return MAPPING_ARRAY[i].byte;
     }
   }
   return undefined;
 }
 
+/**
+ * Convert String to Code Page 437
+ */
 const CP437 = {
   covert: function(data) {
     const bytes = [];
@@ -168,7 +174,7 @@ const CP437 = {
         if (byte) {
           bytes.push(charCode);
         } else {
-          throw Error('Invalid character!');
+          throw Error('Invalid character! Char Code: ' + charCode.toString(16));
         }
       }
     }

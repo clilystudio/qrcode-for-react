@@ -1,3 +1,14 @@
+/*
+  Copyright 2022 Clily Studio
+
+  Use of this source code is governed by an MIT-style
+  license that can be found in the LICENSE file or at
+  https://opensource.org/licenses/MIT.
+*/
+
+/**
+ * Convert String to UTF-8
+ */
 const UTF8 = {
   convert: function(data) {
     const bytes = [];
