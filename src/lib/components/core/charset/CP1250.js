@@ -136,7 +136,7 @@ const MAPPING_ARRAY = [
 
 function getByte(charCode) {
   let len = MAPPING_ARRAY.length;
-  if (charCode < MAPPING_ARRAY[0] || charCode > MAPPING_ARRAY[len - 1]) {
+  if (charCode < MAPPING_ARRAY[0].charCode || charCode > MAPPING_ARRAY[len - 1].charCode) {
     return undefined;
   }
   for (let i = 0; i < len; i++) {
@@ -163,7 +163,7 @@ const CP1250 = {
       } else {
         let byte = getByte(charCode);
         if (byte) {
-          bytes.push(charCode);
+          bytes.push(byte);
         } else {
           throw Error('Invalid character! Char Code: ' + charCode.toString(16));
         }

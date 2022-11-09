@@ -67,7 +67,7 @@ const CP1252 = {
       } else {
         let byte = getByte(charCode);
         if (byte) {
-          bytes.push(charCode);
+          bytes.push(byte);
         } else {
           throw Error('Invalid character! Char Code: ' + charCode.toString(16));
         }

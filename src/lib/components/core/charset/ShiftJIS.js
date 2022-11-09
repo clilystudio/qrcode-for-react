@@ -6928,7 +6928,12 @@ const SJIS = {
       } else {
         let byte = getByte(charCode);
         if (byte) {
-          bytes.push(charCode);
+          if (byte <= 0xff) {
+            bytes.push(byte);
+          } else {
+            bytes.push(byte >>> 8);
+            bytes.push(byte & 0xff);
+          }
         } else {
           throw Error('Invalid character!');
         }

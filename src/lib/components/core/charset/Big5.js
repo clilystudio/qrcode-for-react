@@ -13741,7 +13741,8 @@ const BIG5 = {
       } else {
         let byte = getByte(charCode);
         if (byte) {
-          bytes.push(charCode);
+          bytes.push(byte >>> 8);
+          bytes.push(byte & 0xff);
         } else {
           throw Error('Invalid character!');
         }

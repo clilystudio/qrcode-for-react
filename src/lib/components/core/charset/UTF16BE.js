@@ -19,7 +19,7 @@ const UTF16BE = {
         bytes.push(0x00);
         bytes.push(charCode);
       } else {
-        bytes.push(charCode >> 8);
+        bytes.push(charCode >>> 8);
         bytes.push(charCode & 0xff);
       }
     }

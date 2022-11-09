@@ -1332,7 +1332,7 @@ function getByte(charCode, subset) {
         } else {
           let byte = getByte(charCode, subset);
           if (byte) {
-            bytes.push(charCode);
+            bytes.push(byte);
           } else {
             throw Error('Invalid character! Char Code: ' + charCode.toString(16));
           }
