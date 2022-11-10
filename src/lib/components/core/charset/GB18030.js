@@ -21437,45 +21437,42 @@ const MAPPING_RANGE = [
 function getByte(codePoint) {
   const lenCJK = MAPPING_CJK.length;
   if (codePoint >= MAPPING_CJK[0].unicode && codePoint <= MAPPING_CJK[lenCJK - 1].unicode) {
-    for (let i = 0; i < lenCJK; i++) {
-      if (codePoint === MAPPING_CJK[i].unicode) {
-        return MAPPING_CJK[i].gb18030;
-      }
+    const index = MAPPING_CJK.findIndex((x) => x.unicode === codePoint);
+    if (index >= 0) {
+      return MAPPING_CJK[index].gb18030;
     }
   } else {
-    const lenRange = MAPPING_RANGE.length;
-    for (let i = 0; i < lenRange; i++) {
-      if (codePoint >= MAPPING_RANGE[i].start && codePoint <= MAPPING_RANGE[i].end) {
-        const gb = MAPPING_RANGE[i].gb18030;
-        if (gb < 0xffff) {
-          let byte1 = gb >>> 8;
-          let byte2 = gb & 0xff;
-          if (byte2 > 0x7f) {
-              byte2--;
-          }
-          let offset = (byte1 - 0x81) * 190 + (byte2 - 0x40) + (codePoint - MAPPING_RANGE[i].start);
-          byte2 = offset % 190;
-          if (byte2 >= 0x3f) {
-            byte2++;
-          }
-          byte2 += 0x40;
-          byte1 = Math.floor(offset / 190) + 0x81;
-          return byte1 * 256 + byte2;
-        } else {
-          let byte1 = gb >>> 24;
-          let byte2 = (gb >>> 16) & 0xff;
-          let byte3 = (gb >>> 8) & 0xff;
-          let byte4 = gb & 0xff;
-          let offset = (byte1 - 0x81);
-          offset = offset * 10 + (byte2 - 0x30);
-          offset = offset * 126 + (byte3 - 0x81);
-          offset = offset * 10 + (byte4 - 0x30) + (codePoint - MAPPING_RANGE[i].start);
-          byte4 = (offset % 9) + 0x30;
-          byte3 = (Math.floor(offset / 10) % 126) + 0x81;
-          byte2 = (Math.floor(offset / 1260) % 10) + 0x30;
-          byte1 = (Math.floor(offset / 12600) % 126) + 0x81;
-          return ((byte1 * 256 + byte2) * 256 + byte3) * 256 + byte4;
+    const index = MAPPING_RANGE.findIndex((x) => codePoint >= x.start && codePoint <= x.end);
+    if (index >= 0) {
+      const gb = MAPPING_RANGE[index].gb18030;
+      if (gb < 0xffff) {
+        let byte1 = gb >>> 8;
+        let byte2 = gb & 0xff;
+        if (byte2 > 0x7f) {
+            byte2--;
         }
+        let offset = (byte1 - 0x81) * 190 + (byte2 - 0x40) + (codePoint - MAPPING_RANGE[i].start);
+        byte2 = offset % 190;
+        if (byte2 >= 0x3f) {
+          byte2++;
+        }
+        byte2 += 0x40;
+        byte1 = Math.floor(offset / 190) + 0x81;
+        return byte1 * 256 + byte2;
+      } else {
+        let byte1 = gb >>> 24;
+        let byte2 = (gb >>> 16) & 0xff;
+        let byte3 = (gb >>> 8) & 0xff;
+        let byte4 = gb & 0xff;
+        let offset = (byte1 - 0x81);
+        offset = offset * 10 + (byte2 - 0x30);
+        offset = offset * 126 + (byte3 - 0x81);
+        offset = offset * 10 + (byte4 - 0x30) + (codePoint - MAPPING_RANGE[i].start);
+        byte4 = (offset % 9) + 0x30;
+        byte3 = (Math.floor(offset / 10) % 126) + 0x81;
+        byte2 = (Math.floor(offset / 1260) % 10) + 0x30;
+        byte1 = (Math.floor(offset / 12600) % 126) + 0x81;
+        return ((byte1 * 256 + byte2) * 256 + byte3) * 256 + byte4;
       }
     }
   }

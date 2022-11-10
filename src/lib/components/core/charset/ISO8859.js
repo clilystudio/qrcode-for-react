@@ -1289,20 +1289,16 @@ const MAPPING_ARRAY = [
 ];
 
 function getByte(charCode, subset) {
-  let index = subset - 2;
+  let indexSub = subset - 2;
   if (subset > 10) {
-    index--;
+    indexSub--;
   }
-  let len = MAPPING_ARRAY[index].length;
-  if (charCode < MAPPING_ARRAY[index][0].charCode || charCode > MAPPING_ARRAY[index][len - 1].charCode) {
+  let len = MAPPING_ARRAY[indexSub].length;
+  if (charCode < MAPPING_ARRAY[indexSub][0].charCode || charCode > MAPPING_ARRAY[indexSub][len - 1].charCode) {
     return undefined;
   }
-  for (let i = 0; i < len; i++) {
-    if (charCode === MAPPING_ARRAY[index][i].charCode) {
-      return MAPPING_ARRAY[index][i].byte;
-    }
-  }
-  return undefined;
+  const index = MAPPING_ARRAY[indexSub].findIndex((x) => x.charCode === charCode);
+  return (index >= 0 ? MAPPING_ARRAY[indexSub][index].byte : undefined);
 }
 
 /**

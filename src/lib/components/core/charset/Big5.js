@@ -13719,12 +13719,8 @@ function getByte(charCode) {
   if (charCode < MAPPING_ARRAY[0].charCode || charCode > MAPPING_ARRAY[len - 1].charCode) {
     return undefined;
   }
-  for (let i = 0; i < len; i++) {
-    if (charCode === MAPPING_ARRAY[i].charCode) {
-      return MAPPING_ARRAY[i].big5;
-    }
-  }
-  return undefined;
+  const index = MAPPING_ARRAY.findIndex((x) => x.charCode === charCode);
+  return (index >= 0 ? MAPPING_ARRAY[index].big5 : undefined);
 }
 
 /**
