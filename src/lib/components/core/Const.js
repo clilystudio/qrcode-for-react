@@ -46,6 +46,25 @@ export const ECI = {
   EUC_KR: 30,
 }
 
+export const Size = {
+  Small: 0,
+  Middle: 1,
+  Large: 2,
+}
+
+export const SizeVersionRange = [
+  [0, 9],
+  [9, 26],
+  [26, 40],
+]
+
+export const CountIndicatorSize = [
+  [10, 12, 14],
+  [9, 11, 13],
+  [8, 10, 12],
+  [8, 16, 16],
+];
+
 export const Mode = {
   Number: 0b0001,
   Alpha: 0b0010,
@@ -54,6 +73,24 @@ export const Mode = {
   ECI: 0b0111,
   Struct: 0b0011,
 };
+
+export const KANJI_LEN = [
+  [10, 10, 12],
+  [18, 24, 26],
+];
+
+export const ALPHA_LEN = [
+  [6, 8, 8],
+  [11, 15, 16],
+];
+
+export const NUMBER_LEN = [
+  [4, 4, 5],
+  [7, 9, 9],
+  [6, 8, 9],
+  [6, 8, 8],
+  [13, 15, 17],
+];
 
 export const DATE_CODEWORDS = [
   16,19,9,13,
