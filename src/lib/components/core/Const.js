@@ -61,8 +61,8 @@ const SizeVersionRange = [
 const CountIndicatorSize = [
   [10, 12, 14],
   [9, 11, 13],
-  [8, 10, 12],
   [8, 16, 16],
+  [8, 10, 12],
 ];
 
 const Mode = {
@@ -136,3 +136,4 @@ const DATA_CODEWORDS = [
 ];
 
 export { ErrorCorrectionLevel, ECI, Size, SizeVersionRange, CountIndicatorSize, Mode, KANJI_LEN, ALPHA_LEN, NUMBER_LEN, DATA_CODEWORDS };
+

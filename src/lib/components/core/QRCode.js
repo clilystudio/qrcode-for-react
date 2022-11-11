@@ -7,6 +7,7 @@
 */
 
 import CharSet from './charset/index';
+import Codeword from './Codeword';
 import { DATA_CODEWORDS, ECI, ErrorCorrectionLevel } from './Const';
 import Segment from './Segment';
 
@@ -43,7 +44,6 @@ function checkConfig(config) {
 }
 
 function getMatrix(data, config) {
-  checkConfig(config);
   let dataStr = data;
   if (config.eciConv) {
     const byteArray = CharSet.convert(data, config.eci);
@@ -55,6 +55,7 @@ function getMatrix(data, config) {
     config.versionRange = [config.version, config.version];
   }
   const segments = Segment.create(dataStr, config);
+  Codeword.create(segments, config);
 }
 
 const QRCode = {

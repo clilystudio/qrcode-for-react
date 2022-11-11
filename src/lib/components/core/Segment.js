@@ -46,12 +46,12 @@ function getFitSizeVersion(segments, config, size) {
     } else if (s.mode === Mode.Alpha) {
       bitsCount += CountIndicatorSize[1][size];
       bitsCount += 11 * Math.floor(s.data.length / 2) +  6 * (s.data.length % 2);
-    } else if (s.mode === Mode.Kanji) {
-      bitsCount += CountIndicatorSize[2][size];
-      bitsCount += 13 * Math.floor(s.data.length / 2);
     } else if (s.mode === Mode.Byte) {
-      bitsCount += CountIndicatorSize[3][size];
+      bitsCount += CountIndicatorSize[2][size];
       bitsCount += 8 * s.data.length
+    } else if (s.mode === Mode.Kanji) {
+      bitsCount += CountIndicatorSize[3][size];
+      bitsCount += 13 * Math.floor(s.data.length / 2);
     }
   });
   let minVersion = SizeVersionRange[size][0];
