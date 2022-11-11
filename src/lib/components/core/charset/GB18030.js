@@ -21437,21 +21437,21 @@ const MAPPING_RANGE = [
 function getByte(codePoint) {
   const lenCJK = MAPPING_CJK.length;
   if (codePoint >= MAPPING_CJK[0].unicode && codePoint <= MAPPING_CJK[lenCJK - 1].unicode) {
-    const index = MAPPING_CJK.findIndex((x) => x.unicode === codePoint);
-    if (index >= 0) {
-      return MAPPING_CJK[index].gb18030;
+    const cjk = MAPPING_CJK.find((x) => x.unicode === codePoint);
+    if (cjk) {
+      return cjk.gb18030;
     }
   } else {
-    const index = MAPPING_RANGE.findIndex((x) => codePoint >= x.start && codePoint <= x.end);
-    if (index >= 0) {
-      const gb = MAPPING_RANGE[index].gb18030;
+    const range = MAPPING_RANGE.find((x) => codePoint >= x.start && codePoint <= x.end);
+    if (range) {
+      const gb = range.gb18030;
       if (gb < 0xffff) {
         let byte1 = gb >>> 8;
         let byte2 = gb & 0xff;
         if (byte2 > 0x7f) {
             byte2--;
         }
-        let offset = (byte1 - 0x81) * 190 + (byte2 - 0x40) + (codePoint - MAPPING_RANGE[i].start);
+        let offset = (byte1 - 0x81) * 190 + (byte2 - 0x40) + (codePoint - range.start);
         byte2 = offset % 190;
         if (byte2 >= 0x3f) {
           byte2++;
@@ -21467,7 +21467,7 @@ function getByte(codePoint) {
         let offset = (byte1 - 0x81);
         offset = offset * 10 + (byte2 - 0x30);
         offset = offset * 126 + (byte3 - 0x81);
-        offset = offset * 10 + (byte4 - 0x30) + (codePoint - MAPPING_RANGE[i].start);
+        offset = offset * 10 + (byte4 - 0x30) + (codePoint - range.start);
         byte4 = (offset % 9) + 0x30;
         byte3 = (Math.floor(offset / 10) % 126) + 0x81;
         byte2 = (Math.floor(offset / 1260) % 10) + 0x30;

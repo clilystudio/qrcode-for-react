@@ -18,8 +18,8 @@ const getMappingByte = function(charCode, mappingArray) {
   if (charCode < mappingArray[0].charCode || charCode > mappingArray[len - 1].charCode) {
     return undefined;
   }
-  const index = mappingArray.findIndex((x) => x.charCode === charCode);
-  return (index >= 0 ? mappingArray[index].byte : undefined);
+  const mapping = mappingArray.find((x) => x.charCode === charCode);
+  return (mapping ? mapping.byte : undefined);
 }
 
 const CharSet = {
