@@ -6,14 +6,14 @@
   https://opensource.org/licenses/MIT.
 */
 
-export const ErrorCorrectionLevel = {
+const ErrorCorrectionLevel = {
   L: 0b01,
   M: 0b00,
   Q: 0b11,
   H: 0b10,
 };
 
-export const ECI = {
+const ECI = {
   CP437_0: 0,
   CP437_1: 2,
   ISO_8859_1_0: 1,
@@ -46,26 +46,26 @@ export const ECI = {
   EUC_KR: 30,
 }
 
-export const Size = {
+const Size = {
   Small: 0,
   Middle: 1,
   Large: 2,
 }
 
-export const SizeVersionRange = [
+const SizeVersionRange = [
   [1, 9],
   [10, 26],
   [27, 40],
 ]
 
-export const CountIndicatorSize = [
+const CountIndicatorSize = [
   [10, 12, 14],
   [9, 11, 13],
   [8, 10, 12],
   [8, 16, 16],
 ];
 
-export const Mode = {
+const Mode = {
   Number: 0b0001,
   Alpha: 0b0010,
   Byte: 0b0100,
@@ -74,17 +74,17 @@ export const Mode = {
   Struct: 0b0011,
 };
 
-export const KANJI_LEN = [
+const KANJI_LEN = [
   [10, 10, 12],
   [18, 24, 26],
 ];
 
-export const ALPHA_LEN = [
+const ALPHA_LEN = [
   [6, 8, 8],
   [11, 15, 16],
 ];
 
-export const NUMBER_LEN = [
+const NUMBER_LEN = [
   [4, 4, 5],
   [7, 9, 9],
   [6, 8, 9],
@@ -92,7 +92,7 @@ export const NUMBER_LEN = [
   [13, 15, 17],
 ];
 
-export const DATE_CODEWORDS = [
+const DATA_CODEWORDS = [
   16,19,9,13,
   28,34,16,22,
   44,55,26,34,
@@ -134,3 +134,5 @@ export const DATE_CODEWORDS = [
   2216,2812,1222,1582,
   2334,2956,1276,1666,
 ];
+
+export { ErrorCorrectionLevel, ECI, Size, SizeVersionRange, CountIndicatorSize, Mode, KANJI_LEN, ALPHA_LEN, NUMBER_LEN, DATA_CODEWORDS };

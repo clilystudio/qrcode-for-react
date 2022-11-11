@@ -25,7 +25,7 @@ function getFitSizeVersion(segments, config, size) {
     bitsCount += 4;
     if (s.mode === Const.Mode.Number) {
       bitsCount += Const.CountIndicatorSize[0][size];
-      bitsCount += 10 * Math.floor(s.data.length / 3) + (s.data.length % 3 === 0 ? 0 : (s.data.length % 3 === 1 ? 4 : 7);
+      bitsCount += 10 * Math.floor(s.data.length / 3) + (s.data.length % 3 === 0 ? 0 : (s.data.length % 3 === 1 ? 4 : 7));
     } else if (s.mode === Const.Mode.Alpha) {
       bitsCount += Const.CountIndicatorSize[1][size];
       bitsCount += 11 * Math.floor(s.data.length / 2) +  6 * (s.data.length % 2);
@@ -40,7 +40,7 @@ function getFitSizeVersion(segments, config, size) {
   const minVersion = Math.max(Const.SizeVersionRange[size][0], config.versionRange[0]);
   const maxVersion = Math.min(Const.SizeVersionRange[size][1], config.versionRange[1]);
   for (let v = minVersion; v <= maxVersion; v++) {
-    if (Const.DATE_CODEWORDS[(v - 1) * 4 + config.errorCorrectionLevel] * 8 >= bitsCount)  {
+    if (Const.DATA_CODEWORDS[(v - 1) * 4 + config.errorCorrectionLevel] * 8 >= bitsCount)  {
       return v;
     }
   }
@@ -198,7 +198,7 @@ function getVersionRange(dataStr, config) {
   let maxBitsCount = bitsCount + 16 + dataStr.length * 8
   let minVersion = 0;
   for (let v = 0; v < 40; v++) {
-    if (Const.DATE_CODEWORDS[v * 4 + config.errorCorrectionLevel] * 8 >= minBitsCount)  {
+    if (Const.DATA_CODEWORDS[v * 4 + config.errorCorrectionLevel] * 8 >= minBitsCount)  {
       minVersion = v + 1;
       break;
     }
@@ -208,7 +208,7 @@ function getVersionRange(dataStr, config) {
   }
   let maxVersion = 40;
   for (let v = 0; v < 40; v++) {
-    if (Const.DATE_CODEWORDS[v * 4 + config.errorCorrectionLevel] * 8 >= maxBitsCount)  {
+    if (Const.DATA_CODEWORDS[v * 4 + config.errorCorrectionLevel] * 8 >= maxBitsCount)  {
       maxVersion = v + 1;
       break;
     }
@@ -278,9 +278,9 @@ function getMatrix(data, config) {
 let QRCode = {
   generate: function(data, config) {
     config.version = config.version || 0;
-    config.eci = config.eci == undefined ? Const.ECI.DEFAULT : config.eci;
-    config.eciConv = config.eciConv == undefined ? true : config.eciConv;
-    config.errorCorrectionLevel = config.errorCorrectionLevel == undefined ? Const.ErrorCorrectionLevel.L : config.errorCorrectionLevel;
+    config.eci = config.eci === undefined ? Const.ECI.DEFAULT : config.eci;
+    config.eciConv = config.eciConv === undefined ? true : config.eciConv;
+    config.errorCorrectionLevel = config.errorCorrectionLevel === undefined ? Const.ErrorCorrectionLevel.L : config.errorCorrectionLevel;
     checkConfig(config);
     return getMatrix(data, config);
   },
