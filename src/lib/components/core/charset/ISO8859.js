@@ -1288,24 +1288,11 @@ const MAPPING_ARRAY = [
   ISO_8859_15, ISO_8859_16,
 ];
 
-function getByte(charCode, subset) {
-  let indexSub = subset - 2;
-  if (subset > 10) {
-    indexSub--;
-  }
-  let len = MAPPING_ARRAY[indexSub].length;
-  if (charCode < MAPPING_ARRAY[indexSub][0].charCode || charCode > MAPPING_ARRAY[indexSub][len - 1].charCode) {
-    return undefined;
-  }
-  const index = MAPPING_ARRAY[indexSub].findIndex((x) => x.charCode === charCode);
-  return (index >= 0 ? MAPPING_ARRAY[indexSub][index].byte : undefined);
-}
-
 /**
  * Convert String to ISO/IEC 8859
  */
  const ISO_8859 = {
-  covert: function(data, subset) {
+  convert: function(data, subset, getMappingByte) {
     if (subset < 1 || subset > 16 || subset === 12) {
       throw Error('Invalid subset: ' + subset);
     }
@@ -1326,7 +1313,11 @@ function getByte(charCode, subset) {
         if (charCode <= 0xa0) {
           bytes.push(charCode);
         } else {
-          let byte = getByte(charCode, subset);
+          let indexSub = subset - 2;
+          if (indexSub > 10) {
+            indexSub--;
+          }
+          let byte = getMappingByte(charCode, MAPPING_ARRAY[indexSub]);
           if (byte) {
             bytes.push(byte);
           } else {

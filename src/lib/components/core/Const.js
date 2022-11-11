@@ -53,9 +53,9 @@ export const Size = {
 }
 
 export const SizeVersionRange = [
-  [0, 9],
-  [9, 26],
-  [26, 40],
+  [1, 9],
+  [10, 26],
+  [27, 40],
 ]
 
 export const CountIndicatorSize = [

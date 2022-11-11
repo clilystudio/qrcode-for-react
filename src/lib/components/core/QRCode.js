@@ -6,7 +6,7 @@
   https://opensource.org/licenses/MIT.
 */
 
-import { BIG5, CP1250, CP1251, CP1252, CP1256, CP437, EUCKR, GB18030, ISO8859, SJIS, USASCII, UTF16BE, UTF8 } from './charset/index';
+import CharSet from './charset/index';
 import * as Const from './Const';
 
 function getFitSizeVersion(segments, config, size) {
@@ -34,12 +34,14 @@ function getFitSizeVersion(segments, config, size) {
       bitsCount += 13 * Math.floor(s.data.length / 2);
     } else if (s.mode === Const.Mode.Byte) {
       bitsCount += Const.CountIndicatorSize[3][size];
-      bitsCount += 8 * s.data.length / 2;
+      bitsCount += 8 * s.data.length
     }
   });
-  for (let v = Const.SizeVersionRange[size][0]; v < Const.SizeVersionRange[size][1]; v++) {
-    if (Const.DATE_CODEWORDS[v * 4 + config.errorCorrectionLevel] * 8 >= bitsCount)  {
-      return v + 1;
+  const minVersion = Math.max(Const.SizeVersionRange[size][0], config.versionRange[0]);
+  const maxVersion = Math.min(Const.SizeVersionRange[size][1], config.versionRange[1]);
+  for (let v = minVersion; v <= maxVersion; v++) {
+    if (Const.DATE_CODEWORDS[(v - 1) * 4 + config.errorCorrectionLevel] * 8 >= bitsCount)  {
+      return v;
     }
   }
   return 0;
@@ -248,40 +250,6 @@ function getSegments(dataStr) {
   return segments;
 }
 
-function getBytes(data, eci) {
-  if (eci === Const.ECI.CP437_0 || eci === Const.ECI.CP437_1) {
-    return CP437.convert(data);
-  } else if (eci === Const.ECI.ISO_8859_1_0 || eci === Const.ECI.ISO_8859_1_1) {
-    return ISO8859.covert(data, 1);
-  } else if (eci >= Const.ECI.ISO_8859_2 &&  eci <= Const.ECI.ISO_8859_16) {
-    return ISO8859.covert(data, eci - 2);
-  } else if (eci === Const.ECI.Shift_JIS) {
-    return SJIS.covert(data);
-  } else if (eci === Const.ECI.Windows_1250) {
-    return CP1250.covert(data);
-  } else if (eci === Const.ECI.Windows_1251) {
-    return CP1251.covert(data);
-  } else if (eci === Const.ECI.Windows_1252) {
-    return CP1252.covert(data);
-  } else if (eci === Const.ECI.Windows_1256) {
-    return CP1256.covert(data);
-  } else if (eci === Const.ECI.UTF_16BE) {
-    return UTF16BE.covert(data);
-  } else if (eci === Const.ECI.UTF_8) {
-    return UTF8.covert(data);
-  } else if (eci === Const.ECI.US_ASCII) {
-    return USASCII.covert(data);
-  } else if (eci === Const.ECI.Big5) {
-    return BIG5.covert(data);
-  } else if (eci === Const.ECI.GB_18030) {
-    return GB18030.covert(data);
-  } else if (eci === Const.ECI.EUC_KR) {
-    return EUCKR.covert(data);
-  } else {
-    throw Error('Unknown ECI Assignment Value: ' + eci);
-  }
-}
-
 function checkConfig(config) {
   if (config.version < 0 || config.version > 40) {
     throw Error('Invalid version: ' + config.version);
@@ -293,8 +261,11 @@ function checkConfig(config) {
 
 function getMatrix(data, config) {
   checkConfig(config);
-  const byteArray = getBytes(data, config.eci);
-  const dataStr = String.fromCharCode(byteArray);
+  let dataStr = data;
+  if (config.eciConv) {
+    const byteArray = CharSet.convert(data, config.eci);
+    dataStr = String.fromCharCode(byteArray);
+  }
   const segments = getSegments(dataStr);
   if (config.version === 0) {
     config.versionRange = getVersionRange(dataStr, config);
@@ -305,14 +276,13 @@ function getMatrix(data, config) {
 }
 
 let QRCode = {
-  config: {},
   generate: function(data, config) {
-    this.config = {...config};
-    this.config.version = this.config.version || 0;
-    this.config.eci = this.config.eci || Const.ECI.DEFAULT;
-    this.config.errorCorrectionLevel = this.config.errorCorrectionLevel || Const.ErrorCorrectionLevel.L;
-    checkConfig(this.config);
-    return getMatrix(data, this.config);
+    config.version = config.version || 0;
+    config.eci = config.eci == undefined ? Const.ECI.DEFAULT : config.eci;
+    config.eciConv = config.eciConv == undefined ? true : config.eciConv;
+    config.errorCorrectionLevel = config.errorCorrectionLevel == undefined ? Const.ErrorCorrectionLevel.L : config.errorCorrectionLevel;
+    checkConfig(config);
+    return getMatrix(data, config);
   },
 }
 

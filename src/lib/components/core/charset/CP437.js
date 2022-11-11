@@ -139,20 +139,11 @@ const MAPPING_ARRAY = [
   {charCode: 0x25a0, byte: 0xfe},
 ];
 
-function getByte(charCode) {
-  let len = MAPPING_ARRAY.length;
-  if (charCode < MAPPING_ARRAY[0].charCode || charCode > MAPPING_ARRAY[len - 1].charCode) {
-    return undefined;
-  }
-  const index = MAPPING_ARRAY.findIndex((x) => x.charCode === charCode);
-  return (index >= 0 ? MAPPING_ARRAY[index].byte : undefined);
-}
-
 /**
  * Convert String to Code Page 437
  */
 const CP437 = {
-  covert: function(data) {
+  convert: function(data, getMappingByte) {
     const bytes = [];
     const len = data.length;
     for (let i = 0; i < len; i++) {
@@ -166,7 +157,7 @@ const CP437 = {
       } else if (charCode < 0x7f) {
         bytes.push(charCode);
       } else {
-        let byte = getByte(charCode);
+        let byte = getMappingByte(charCode, MAPPING_ARRAY);
         if (byte) {
           bytes.push(byte);
         } else {

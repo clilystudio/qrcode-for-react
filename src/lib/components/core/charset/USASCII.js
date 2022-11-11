@@ -10,7 +10,7 @@
  * Convert String to US ASCII
  */
 const USASCII = {
-  covert: function(data) {
+  convert: function(data) {
     const bytes = [];
     const len = data.length;
     for (let i = 0; i < len; i++) {

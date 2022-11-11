@@ -134,30 +134,19 @@ const MAPPING_ARRAY = [
   {charCode: 0x2122, byte: 0x99},
 ];
 
-function getByte(charCode) {
-  let len = MAPPING_ARRAY.length;
-  if (charCode < MAPPING_ARRAY[0].charCode || charCode > MAPPING_ARRAY[len - 1].charCode) {
-    return undefined;
-  }
-  const index = MAPPING_ARRAY.findIndex((x) => x.charCode === charCode);
-  return (index >= 0 ? MAPPING_ARRAY[index].byte : undefined);
-}
-
 /**
  * Convert String to Code Page 1250
  */
 const CP1250 = {
-  covert: function(data) {
+  convert: function(data, getMappingByte) {
     const bytes = [];
     const len = data.length;
     for (let i = 0; i < len; i++) {
       let charCode = data.charCodeAt(i);
       if (charCode < 0x80) {
         bytes.push(charCode);
-      } else if (charCode < 0xa0 || charCode > 0x2122) {
-        throw Error('Invalid character! Char Code: ' + charCode.toString(16));
       } else {
-        let byte = getByte(charCode);
+        let byte = getMappingByte(charCode, MAPPING_ARRAY);
         if (byte) {
           bytes.push(byte);
         } else {
