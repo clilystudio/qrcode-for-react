@@ -16,13 +16,13 @@ function getSegment(dataStr, offset) {
   let ma = dataStr.match(reAlpha);
   let mk = dataStr.match(reKanji);
   if (mn) {
-    return {mode: Mode.Number, data: mn[1]};
+    return { mode: Mode.Number, data: mn[1] };
   } else if (ma) {
-    return {mode: Mode.Alpha, data: ma[1]};
+    return { mode: Mode.Alpha, data: ma[1] };
   } else if (mk) {
-    return {mode: Mode.Kanji, data: mk[1]};
+    return { mode: Mode.Kanji, data: mk[1] };
   } else {
-    return {mode: Mode.Byte, data: dataStr.substr(offset, 1)};
+    return { mode: Mode.Byte, data: dataStr.substr(offset, 1) };
   }
 }
 
@@ -45,10 +45,10 @@ function getFitSizeVersion(segments, config, size) {
       bitsCount += 10 * Math.floor(s.data.length / 3) + (s.data.length % 3 === 0 ? 0 : (s.data.length % 3 === 1 ? 4 : 7));
     } else if (s.mode === Mode.Alpha) {
       bitsCount += CountIndicatorSize[1][size];
-      bitsCount += 11 * Math.floor(s.data.length / 2) +  6 * (s.data.length % 2);
+      bitsCount += 11 * Math.floor(s.data.length / 2) + 6 * (s.data.length % 2);
     } else if (s.mode === Mode.Byte) {
       bitsCount += CountIndicatorSize[2][size];
-      bitsCount += 8 * s.data.length
+      bitsCount += 8 * s.data.length;
     } else if (s.mode === Mode.Kanji) {
       bitsCount += CountIndicatorSize[3][size];
       bitsCount += 13 * Math.floor(s.data.length / 2);
@@ -61,7 +61,7 @@ function getFitSizeVersion(segments, config, size) {
     maxVersion = config.version;
   }
   for (let v = minVersion; v <= maxVersion; v++) {
-    if (DATA_CODEWORDS[(v - 1) * 4 + config.errorCorrectionLevel] * 8 >= bitsCount)  {
+    if (DATA_CODEWORDS[(v - 1) * 4 + config.errorCorrectionLevel] * 8 >= bitsCount) {
       return v;
     }
   }
@@ -73,7 +73,7 @@ function optimizeInSize(segments, config, size) {
   const len = segments.length;
   if (len === 0) {
     config.fitSizeVersion = 1;
-    optSegs.push({mode: Mode.Byte, data: ''});
+    optSegs.push({ mode: Mode.Byte, data: '' });
     return optSegs;
   } else if (len === 1) {
     optSegs.push(segments[0]);
@@ -83,24 +83,24 @@ function optimizeInSize(segments, config, size) {
       optSegs.push(segments[0]);
     } else if (segments[0].mode === Mode.Kanji) {
       if (segments[1].mode === Mode.Byte && segments[0].data.length < KANJI_LEN[0][size]) {
-        optSegs.push({mode: Mode.Byte, data: segments[0].data + segments[1].data})
+        optSegs.push({ mode: Mode.Byte, data: segments[0].data + segments[1].data });
         indexCurr = 2;
       } else {
         optSegs.push(segments[0]);
       }
     } else if (segments[0].mode === Mode.Alpha) {
       if (segments[1].mode === Mode.Byte && segments[0].data.length < ALPHA_LEN[0][size]) {
-        optSegs.push({mode: Mode.Byte, data: segments[0].data + segments[1].data})
+        optSegs.push({ mode: Mode.Byte, data: segments[0].data + segments[1].data });
         indexCurr = 2;
       } else {
         optSegs.push(segments[0]);
       }
     } else if (segments[0].mode === Mode.Number) {
       if (segments[1].mode === Mode.Byte && segments[0].data.length < NUMBER_LEN[0][size]) {
-        optSegs.push({mode: Mode.Byte, data: segments[0].data + segments[1].data})
+        optSegs.push({ mode: Mode.Byte, data: segments[0].data + segments[1].data });
         indexCurr = 2;
       } else if (segments[1].mode === Mode.Alpha && segments[0].data.length < NUMBER_LEN[1][size]) {
-        optSegs.push({mode: Mode.Alpha, data: segments[0].data + segments[1].data})
+        optSegs.push({ mode: Mode.Alpha, data: segments[0].data + segments[1].data });
         indexCurr = 2;
       } else {
         optSegs.push(segments[0]);
@@ -203,7 +203,7 @@ function optimizeSegments(segments, config) {
 }
 
 const Segment = {
-  create: function(dataStr, config) {
+  generate: function (dataStr, config) {
     const segments = [];
     const len = dataStr.length;
     let offset = 0;

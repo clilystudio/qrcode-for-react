@@ -48,7 +48,7 @@ function appendECI(codewords, eci) {
 }
 
 function appendNumber(codewords, segments, size) {
-  let count = segments.data.length
+  let count = segments.data.length;
   appendBits(codewords, count, CountIndicatorSize[0][size]);
   for (let offset = 0; offset <= count - 3; offset += 3) {
     appendBits(codewords, parseInt(segments.data.substr(offset, 3), 10), 10);
@@ -74,7 +74,7 @@ function getAlphaValue(alpha) {
 }
 
 function appendAlpha(codewords, segments, size) {
-  let count = segments.data.length
+  let count = segments.data.length;
   appendBits(codewords, count, CountIndicatorSize[1][size]);
   for (let offset = 0; offset <= count - 2; offset += 2) {
     const value = getAlphaValue(segments.data.charCodeAt(offset)) * 45 + getAlphaValue(segments.data.charCodeAt(offset + 1));
@@ -87,7 +87,7 @@ function appendAlpha(codewords, segments, size) {
 }
 
 function appendByte(codewords, segments, size) {
-  let count = segments.data.length
+  let count = segments.data.length;
   appendBits(codewords, count, CountIndicatorSize[2][size]);
   for (let offset = 0; offset < count; offset++) {
     appendBits(codewords, segments.data.charCodeAt(offset), 8);
@@ -95,7 +95,7 @@ function appendByte(codewords, segments, size) {
 }
 
 function appendKnaji(codewords, segments, size) {
-  let count = segments.data.length
+  let count = segments.data.length;
   appendBits(codewords, count, CountIndicatorSize[3][size]);
   for (let offset = 0; offset <= count - 2; offset += 2) {
     let byte = (segments.data.charCodeAt(offset) << 8) | segments.data.charCodeAt(offset + 1);
@@ -135,8 +135,8 @@ function creatMessageSequece(codeBlocks) {
 }
 
 const Codeword = {
-  create: function(segments, config) {
-    const codewords = {words: [0x00], offset: 0};
+  generate: function (segments, config) {
+    const codewords = { words: [0x00], offset: 0 };
     appendECI(codewords, config.ECI);
 
     let size = Size.Large;
