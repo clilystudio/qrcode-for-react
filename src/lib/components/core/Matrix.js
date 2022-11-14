@@ -81,8 +81,8 @@ function isVaildPos(position, matrix) {
   return true;
 }
 
-function getNextPos(position, matrix) {
-  if (position.x === 0 && position.y === matrix.size - 9) {
+function getNextPos(position, size) {
+  if (position.x === 0 && position.y === size - 9) {
     return;
   }
   if (position.x % 2 === 0) {
@@ -103,22 +103,22 @@ function getNextPos(position, matrix) {
       }
     } else {
       position.y++;
-      if (position.y < matrix.size) {
+      if (position.y < size) {
         position.x++;
       } else {
         position.x--;
-        position.y = matrix.size - 1;
+        position.y = size - 1;
         position.dir = 0;
       }
     }
   }
   if (!isVaildPos(position)) {
-    getNextPos(position, matrix);
+    getNextPos(position, size);
   }
 }
 
 function placeCordwords(message, matrix) {
-  const position = { x: size - 1, y: size - 1, dir: 0 };
+  const position = { x: matrix.size - 1, y: matrix.size - 1, dir: 0 };
   for (const codeword of message) {
     for (let i = 7; i >= 0; i--) {
       const bit = (codeword >>> i) & 0x1;
@@ -127,7 +127,7 @@ function placeCordwords(message, matrix) {
         const offset = 31 - (position.x % 32);
         matrix.bits[position.y][index] |= (0x1 << offset);
       }
-      getNextPos(position, matrix);
+      getNextPos(position, matrix.size);
     }
   }
 }
@@ -216,6 +216,14 @@ function setAlignment(matrix) {
   }
 }
 
+function setVersion(matrix) {
+
+}
+
+function getScore(masked) {
+
+}
+
 function getMasked(matrix, mask) {
   for (let x = 0; x < matrix.size; x++) {
     for (let y = 0; x < matrix.size; x++) {
@@ -240,7 +248,7 @@ function init(config) {
   matrix.version = config.fitVersion;
   matrix.size = config.fitVersion * 4 + 17;
   matrix.mask = config.mask;
-  matrix.bits = Array(size).fill().map(_ => Array(Math.ceil(matrix.size / 32)).fill(0x00000000));
+  matrix.bits = Array(matrix.size).fill().map(_ => Array(Math.ceil(matrix.size / 32)).fill(0x00000000));
   if (matrix.version < 2) {
     matrix.alignment = [];
   } else if (matrix.version < 7) {
@@ -251,6 +259,9 @@ function init(config) {
   setFinderPattern(matrix);
   setTimingPattern(matrix);
   setAlignment(matrix);
+  if (matrix.version >= 7) {
+    setVersion(matrix);
+  }
 }
 
 const Matrix = {
