@@ -1411,6 +1411,10 @@ function getScore(masked) {
 
 }
 
+function setFormatInfo(masked, matrix, mask) {
+
+}
+
 function shouldMask(i, j, mask) {
   return (mask === 0 && (i + j) % 2 === 0)
   || (mask === 1 && i % 2 === 0)
@@ -1439,6 +1443,7 @@ function getMasked(matrix, mask) {
       masked[y][x] ^= matrix.bits[y][x];
     }
   }
+  setFormatInfo(masked, matrix, mask);
   return masked;
 }
 
