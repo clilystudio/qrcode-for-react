@@ -1316,38 +1316,38 @@ function getVersionRange(dataStr, config) {
   return [minVersion, maxVersion];
 }
 
-function isVaildPos(position, matrix) {
-  if (position.x === 6 || position.y === 6) {
+function isEncodeRegion(i, j, matrix) {
+  if (i === 6 || j === 6) {
     // timing pattern
     return false;
   }
-  if (position.x <= 8) {
-    if (position.y <= 8) {
+  if (i <= 8) {
+    if (j <= 8) {
       // find pattern (topleft) and format information
       return false;
     }
-    if (position.y >= matrix.size - 8) {
+    if (j >= matrix.size - 8) {
       // find pattern (bottomleft) and format information
       return false;
     }
   }
-  if (position.y <= 8 && position.x >= matrix.size - 8) {
+  if (j <= 8 && i >= matrix.size - 8) {
     // find pattern (topright) and format information
     return false;
   }
   if (matrix.version >= 7) {
-    if (position.x < 6 && position.y >= matrix.size - 11 && position.y <= matrix.size - 9) {
+    if (i < 6 && j >= matrix.size - 11 && j <= matrix.size - 9) {
       // version information #1
       return false;
     }
-    if (position.y < 6 && position.x >= matrix.size - 11 && position.x <= matrix.size - 9) {
+    if (j < 6 && i >= matrix.size - 11 && i <= matrix.size - 9) {
       // version information #2
       return false;
     }
   }
   for (let x of matrix.alignment) {
     for (let y of matrix.alignment) {
-      if (Math.abs(matrix.x - x) <= 2 && Math.abs(matrix.y - y) <= 2) {
+      if (Math.abs(i - x) <= 2 && Math.abs(j - y) <= 2) {
         // alignment pattern
         return false;
       }
@@ -1356,8 +1356,8 @@ function isVaildPos(position, matrix) {
   return true;
 }
 
-function getNextPos(position, size) {
-  if (position.x === 0 && position.y === size - 9) {
+function getNextPos(position, matrix) {
+  if (position.x === 0 && position.y <= matrix.size - 9) {
     return;
   }
   if (position.x % 2 === 0) {
@@ -1378,17 +1378,17 @@ function getNextPos(position, size) {
       }
     } else {
       position.y++;
-      if (position.y < size) {
+      if (position.y < matrix.size) {
         position.x++;
       } else {
         position.x--;
-        position.y = size - 1;
+        position.y = matrix.size - 1;
         position.dir = 0;
       }
     }
   }
-  if (!isVaildPos(position)) {
-    getNextPos(position, size);
+  if (!isEncodeRegion(position.x, position.y, matrix)) {
+    getNextPos(position, matrix);
   }
 }
 
@@ -1411,17 +1411,41 @@ function getScore(masked) {
 
 }
 
+function shouldMask(i, j, mask) {
+  return (mask === 0 && (i + j) % 2 === 0)
+  || (mask === 1 && i % 2 === 0)
+  || (mask === 2 && j % 3 === 0)
+  || (mask === 3 && (i + j) % 3 === 0)
+  || (mask === 4 && (Math.floor(i / 2) + Math.floor(j / 3)) % 2 === 0)
+  || (mask === 5 && (i * j) % 2 + (i * j) % 3 === 0)
+  || (mask === 6 && (i * j + (i * j) % 3) % 2 === 0)
+  || (mask === 7 && (i + j + (i * j) % 3) % 2 === 0);
+}
+
 function getMasked(matrix, mask) {
+  const len = Math.ceil(matrix.size / 32);
+  const masked = Array(matrix.size).fill().map(_ => new Uint32Array(len));
   for (let x = 0; x < matrix.size; x++) {
-    for (let y = 0; x < matrix.size; x++) {
+    for (let y = 0; y < matrix.size; y++) {
+      if (shouldMask(x, y, mask) && isEncodeRegion(x, y, matrix)) {
+        const index = Math.floor(x / 32);
+        const offset = 31 - (x % 32);
+        masked[y][index] |= (0x1 << offset);
+      }
     }
   }
+  for (let x = 0; x < len; x++) {
+    for (let y = 0; y < matrix.size; y++) {
+      masked[y][x] ^= matrix.bits[y][x];
+    }
+  }
+  return masked;
 }
 
 function getBestMasked(matrix) {
   let score = Number.MAX_VALUE;
   for (let mask = 0; mask < 8; mask++) {
-    const masked = getMasked(matrix, matrix.mask);
+    const masked = getMasked(matrix, mask);
     let maskScore = getScore(masked);
     if (maskScore < score) {
       score = maskScore;
@@ -1443,7 +1467,7 @@ function init(config) {
     matrix.alignment = [6, ...ALIGNMENT_POSITIONS[matrix.version - 7], matrix.size - 7];
   }
   const len = Math.ceil(matrix.size / 32);
-  matrix.bits = Array(matrix.size).fill().map(_ => Array(len).fill(0x00000000));
+  matrix.bits = Array(matrix.size).fill().map(_ => new Uint32Array(len));
   const bitsArray = MATRIX_BITS_ARRAY[matrix.version - 1];
   for (const initBits of bitsArray) {
     for (const index of initBits.indexes) {
