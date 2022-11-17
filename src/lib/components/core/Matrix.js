@@ -1293,6 +1293,13 @@ const MATRIX_BITS_ARRAY = [
   ],
 ];
 
+const FORMAT_INFO_BITS = [
+  0x5412, 0x5125, 0x5e7c, 0x5b4b, 0x45f9, 0x40ce, 0x4f97, 0x4aa0,
+  0x77c4, 0x72f3, 0x7daa, 0x789d, 0x662f, 0x6318, 0x6c41, 0x6976,
+  0x1689, 0x13be, 0x1ce7, 0x19d0, 0x0762, 0x0255, 0x0d0c, 0x083b,
+  0x355f, 0x3068, 0x3f31, 0x3a06, 0x24b4, 0x2183, 0x2eda, 0x2bed,
+];
+
 function getVersionRange(dataStr, config) {
   let minBitsCount = 4 + 10 + 10 * Math.floor(dataStr.length / 3) + (dataStr.length % 3 === 0 ? 0 : (dataStr.length % 3 === 1 ? 4 : 7));
   let maxBitsCount = 28 + 4 + 16 + dataStr.length * 8;
@@ -1314,6 +1321,12 @@ function getVersionRange(dataStr, config) {
     }
   }
   return [minVersion, maxVersion];
+}
+
+function setBit(i, j, bits) {
+  const index = Math.floor(i / 32);
+  const offset = 31 - (j % 32);
+  bits[j][index] |= (0x1 << offset);
 }
 
 function isEncodeRegion(i, j, matrix) {
@@ -1398,9 +1411,7 @@ function placeCordwords(message, matrix) {
     for (let i = 7; i >= 0; i--) {
       const bit = (codeword >>> i) & 0x1;
       if (bit) {
-        const index = Math.floor(position.x / 32);
-        const offset = 31 - (position.x % 32);
-        matrix.bits[position.y][index] |= (0x1 << offset);
+        setBit(position.x, position.y, matrix.bits);
       }
       getNextPos(position, matrix.size);
     }
@@ -1408,11 +1419,37 @@ function placeCordwords(message, matrix) {
 }
 
 function getScore(masked) {
+  const len = masked.length;
 
 }
 
-function setFormatInfo(masked, matrix, mask) {
+function setFormatInfo(masked, errorCorrectionLevel, mask) {
+  const formatInfo = FORMAT_INFO_BITS[(errorCorrectionLevel << 3) | mask];
 
+  masked[8][0] |= (((formatInfo >>> 9) & 0x3f) << 26) | (((formatInfo >>> 7) & 0x3) << 23);
+
+  const len = masked.length;
+  let bitMask = 1;
+  for (let offset = 0; offset <= 5; offset++) {
+    if (formatInfo & bitMask) {
+      setBit(8, offset, masked);
+      setBit(len - 1 - offset, 8, masked);
+    }
+    bitMask = bitMask << 1;
+  }
+  for (let offset = 6; offset <= 7; offset++) {
+    if (formatInfo & bitMask) {
+      setBit(8, offset + 1, masked);
+      setBit(len - 1 - offset, 8, masked);
+    }
+    bitMask = bitMask << 1;
+  }
+  for (let offset = 8; offset <= 14; offset++) {
+    if (formatInfo & bitMask) {
+      setBit(8, offset - 15 + offset, masked);
+    }
+    bitMask = bitMask << 1;
+  }
 }
 
 function shouldMask(i, j, mask) {
@@ -1432,9 +1469,7 @@ function getMasked(matrix, mask) {
   for (let x = 0; x < matrix.size; x++) {
     for (let y = 0; y < matrix.size; y++) {
       if (shouldMask(x, y, mask) && isEncodeRegion(x, y, matrix)) {
-        const index = Math.floor(x / 32);
-        const offset = 31 - (x % 32);
-        masked[y][index] |= (0x1 << offset);
+        setBit(x, y, masked);
       }
     }
   }
@@ -1443,7 +1478,7 @@ function getMasked(matrix, mask) {
       masked[y][x] ^= matrix.bits[y][x];
     }
   }
-  setFormatInfo(masked, matrix, mask);
+  setFormatInfo(masked, matrix.errorCorrectionLevel, mask);
   return masked;
 }
 
@@ -1463,6 +1498,7 @@ function init(config) {
   const matrix = {};
   matrix.version = config.fitVersion;
   matrix.size = config.fitVersion * 4 + 17;
+  matrix.errorCorrectionLevel = config.errorCorrectionLevel;
   matrix.mask = config.mask;
   if (matrix.version < 2) {
     matrix.alignment = [];
