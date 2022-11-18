@@ -1454,7 +1454,8 @@ function getScore(masked) {
     sameCount = 0;
   }
   // Calculate N4
-  score += Math.floor(Math.abs(100 * darkCount / len / len - 50) / 10) * 10;
+  const total = len * len;
+  score += Math.floor(10 * Math.abs(2 * darkCount - total) / total) * 10;
   // Calculate N1 on Row
   for (let y = 0; y < len; y++) {
     let patternBits = 0;
