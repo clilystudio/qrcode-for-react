@@ -128,14 +128,14 @@ function optimizeInSize(segments, config, size) {
               countBeforeAlpha += optSegs[indexNextAlpha].data.length;
               indexNextAlpha++;
             }
-            if (indexNextAlpha === len || countBeforeAlpha >= NUMBER_LEN[3][size]) {
+            if (countBeforeAlpha >= NUMBER_LEN[3][size]) {
               optSegs.push(segments[indexCurr]);
             } else {
-              optSegs[optSegs.length - 1].data = optSegs[optSegs.length - 1].date + segments[indexCurr].data;
+              optSegs[optSegs.length - 1].data = optSegs[optSegs.length - 1].data + segments[indexCurr].data;
             }
           }
         } else {
-          optSegs[optSegs.length - 1].data = optSegs[optSegs.length - 1].date + segments[indexCurr].data;
+          optSegs[optSegs.length - 1].data = optSegs[optSegs.length - 1].data + segments[indexCurr].data;
         }
       } else if (optSegs[optSegs.length - 1].mode === Mode.Alpha) {
         if (segments[indexCurr].mode === Mode.Kanji || segments[indexCurr].mode === Mode.Byte) {
@@ -143,29 +143,29 @@ function optimizeInSize(segments, config, size) {
         } else if (segments[indexCurr].mode === Mode.Number) {
           let indexNextAlpha = indexCurr;
           let countBeforeAlpha = 0;
-          while (indexNextAlpha < len && optSegs[indexNextAlpha].mode !== Mode.Alpha) {
-            countBeforeAlpha += optSegs[indexNextAlpha].data.length;
+          while (indexNextAlpha < len && segments[indexNextAlpha].mode !== Mode.Alpha) {
+            countBeforeAlpha += segments[indexNextAlpha].data.length;
             indexNextAlpha++;
           }
-          if (indexNextAlpha === len || countBeforeAlpha >= NUMBER_LEN[4][size]) {
+          if (countBeforeAlpha >= NUMBER_LEN[4][size]) {
             optSegs.push(segments[indexCurr]);
           } else {
-            optSegs[optSegs.length - 1].data = optSegs[optSegs.length - 1].date + segments[indexCurr].data;
+            optSegs[optSegs.length - 1].data = optSegs[optSegs.length - 1].data + segments[indexCurr].data;
           }
         } else {
-          optSegs[optSegs.length - 1].data = optSegs[optSegs.length - 1].date + segments[indexCurr].data;
+          optSegs[optSegs.length - 1].data = optSegs[optSegs.length - 1].data + segments[indexCurr].data;
         }
       } else if (optSegs[optSegs.length - 1].mode === Mode.Number) {
         if (segments[indexCurr].mode !== Mode.Number) {
           optSegs.push(segments[indexCurr]);
         } else {
-          optSegs[optSegs.length - 1].data = optSegs[optSegs.length - 1].date + segments[indexCurr].data;
+          optSegs[optSegs.length - 1].data = optSegs[optSegs.length - 1].data + segments[indexCurr].data;
         }
       } else if (optSegs[optSegs.length - 1].mode === Mode.Kanji) {
         if (segments[indexCurr].mode !== Mode.Kanji) {
           optSegs.push(segments[indexCurr]);
         } else {
-          optSegs[optSegs.length - 1].data = optSegs[optSegs.length - 1].date + segments[indexCurr].data;
+          optSegs[optSegs.length - 1].data = optSegs[optSegs.length - 1].data + segments[indexCurr].data;
         }
       } else {
         throw Error('Invalid Segment Mode: ' + optSegs[optSegs.length - 1].mode);
