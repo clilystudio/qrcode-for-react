@@ -1335,7 +1335,7 @@ function getBit(i, j, bits) {
   return (bits[j][index] | (0x1 << offset)) ? 1 : 0;
 }
 
-function isEncodeRegion(i, j, matrix) {
+function isEncodeRegion(i, j, matrix, alignments) {
   if (i === 6 || j === 6) {
     // timing pattern
     return false;
@@ -1364,8 +1364,8 @@ function isEncodeRegion(i, j, matrix) {
       return false;
     }
   }
-  for (let x of matrix.alignment) {
-    for (let y of matrix.alignment) {
+  for (let x of alignments) {
+    for (let y of alignments) {
       if (Math.abs(i - x) <= 2 && Math.abs(j - y) <= 2) {
         // alignment pattern
         return false;
@@ -1375,8 +1375,8 @@ function isEncodeRegion(i, j, matrix) {
   return true;
 }
 
-function getNextPos(position, matrix) {
-  if (position.x === 0 && position.y <= matrix.size - 9) {
+function getNextPos(position, config) {
+  if (position.x === 0 && position.y <= config.size - 9) {
     return;
   }
   if (position.x % 2 === 0) {
@@ -1397,29 +1397,29 @@ function getNextPos(position, matrix) {
       }
     } else {
       position.y++;
-      if (position.y < matrix.size) {
+      if (position.y < config.size) {
         position.x++;
       } else {
         position.x--;
-        position.y = matrix.size - 1;
+        position.y = config.size - 1;
         position.dir = 0;
       }
     }
   }
-  if (!isEncodeRegion(position.x, position.y, matrix)) {
-    getNextPos(position, matrix);
+  if (!isEncodeRegion(position.x, position.y, config.alignments)) {
+    getNextPos(position, config);
   }
 }
 
-function placeCordwords(message, matrix) {
+function placeCordwords(message, matrix, config) {
   const position = { x: matrix.size - 1, y: matrix.size - 1, dir: 0 };
   for (const codeword of message) {
     for (let i = 7; i >= 0; i--) {
       const bit = (codeword >>> i) & 0x1;
       if (bit) {
-        setBit(position.x, position.y, matrix.bits);
+        setBit(position.x, position.y, config.bits);
       }
-      getNextPos(position, matrix.size);
+      getNextPos(position, config);
     }
   }
 }
@@ -1531,12 +1531,12 @@ function shouldMask(i, j, mask) {
   || (mask === 7 && (i + j + (i * j) % 3) % 2 === 0);
 }
 
-function getMasked(matrix, mask) {
-  const len = Math.ceil(matrix.size / 32);
-  const masked = Array(matrix.size).fill().map(_ => new Uint32Array(len));
-  for (let x = 0; x < matrix.size; x++) {
-    for (let y = 0; y < matrix.size; y++) {
-      if (shouldMask(x, y, mask) && isEncodeRegion(x, y, matrix)) {
+function getSymbol(matrix, mask, config) {
+  const len = Math.ceil(config.size / 32);
+  const masked = Array(config.size).fill().map(_ => new Uint32Array(len));
+  for (let x = 0; x < config.size; x++) {
+    for (let y = 0; y < config.size; y++) {
+      if (shouldMask(x, y, mask) && isEncodeRegion(x, y, matrix, config.alignments)) {
         setBit(x, y, masked);
       }
     }
@@ -1550,14 +1550,14 @@ function getMasked(matrix, mask) {
   return masked;
 }
 
-function getBestMasked(matrix) {
+function getBestSymbol(matrix, config) {
   let score = Number.MAX_VALUE;
   for (let mask = 0; mask < 8; mask++) {
-    const masked = getMasked(matrix, mask);
+    const masked = getSymbol(matrix, mask, config);
     let maskScore = getScore(masked);
     if (maskScore < score) {
       score = maskScore;
-      matrix.masked = masked;
+      matrix.symbol = masked;
       matrix.mask = mask;
     }
   }
@@ -1566,24 +1566,24 @@ function getBestMasked(matrix) {
 function init(config) {
   const matrix = {};
   matrix.version = config.fitSizeVersion;
-  matrix.size = config.fitSizeVersion * 4 + 17;
+  config.size = config.fitSizeVersion * 4 + 17;
   matrix.errorCorrectionLevel = config.errorCorrectionLevel;
   matrix.mask = config.mask;
   if (matrix.version < 2) {
-    matrix.alignment = [];
+    config.alignments = [];
   } else if (matrix.version < 7) {
-    matrix.alignment = [6, matrix.size - 7];
+    config.alignments = [6, matrix.size - 7];
   } else {
-    matrix.alignment = [6, ...ALIGNMENT_POSITIONS[matrix.version - 7], matrix.size - 7];
+    config.alignments = [6, ...ALIGNMENT_POSITIONS[matrix.version - 7], matrix.size - 7];
   }
-  const len = Math.ceil(matrix.size / 32);
-  matrix.bits = Array(matrix.size).fill().map(_ => new Uint32Array(len));
+  const len = Math.ceil(config.size / 32);
+  config.bits = Array(config.size).fill().map(_ => new Uint32Array(len));
   const bitsArray = MATRIX_BITS_ARRAY[matrix.version - 1];
   for (const initBits of bitsArray) {
     for (const index of initBits.indexes) {
       const x = index % len;
       const y = Math.floor(index / len);
-      matrix.bits[y][x] = initBits.bytes;
+      config.bits[y][x] = initBits.bytes;
     }
   }
   return matrix;
@@ -1604,11 +1604,11 @@ const Matrix = {
     const segments = Segment.generate(dataStr, config);
     const message = Codeword.generate(segments, config);
     const matrix = init(config);
-    placeCordwords(message, matrix);
+    placeCordwords(message, matrix, config);
     if (matrix.mask === undefined) {
-      getBestMasked(matrix);
+      getBestSymbol(matrix, config);
     } else {
-      matrix.masked = getMasked(matrix, matrix.mask);
+      matrix.symbol = getSymbol(matrix, matrix.mask, config);
     }
     return matrix;
   },

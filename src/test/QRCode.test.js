@@ -5,4 +5,5 @@ test('QRCode Test 1', () => {
   let config = {};
   const matrix = QRCode.generate(data,config);
   console.log(matrix);
+  console.log(config);
 });
