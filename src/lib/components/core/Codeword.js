@@ -47,16 +47,16 @@ function appendECI(codewords, eci) {
   }
 }
 
-function appendNumber(codewords, segments, size) {
-  let count = segments.data.length;
+function appendNumber(codewords, segment, size) {
+  let count = segment.data.length;
   appendBits(codewords, count, CountIndicatorSize[0][size]);
   for (let offset = 0; offset <= count - 3; offset += 3) {
-    appendBits(codewords, parseInt(segments.data.substr(offset, 3), 10), 10);
+    appendBits(codewords, parseInt(segment.data.substr(offset, 3), 10), 10);
   }
   if (count % 3 === 1) {
-    appendBits(codewords, parseInt(segments.data.substr(-1), 10), 4);
+    appendBits(codewords, parseInt(segment.data.substr(-1), 10), 4);
   } else if (count % 3 === 2) {
-    appendBits(codewords, parseInt(segments.data.substr(-2), 10), 7);
+    appendBits(codewords, parseInt(segment.data.substr(-2), 10), 7);
   }
 }
 
@@ -73,32 +73,32 @@ function getAlphaValue(alpha) {
   return ALPHA_VALUE[alpha - 36];
 }
 
-function appendAlpha(codewords, segments, size) {
-  let count = segments.data.length;
+function appendAlpha(codewords, segment, size) {
+  let count = segment.data.length;
   appendBits(codewords, count, CountIndicatorSize[1][size]);
   for (let offset = 0; offset <= count - 2; offset += 2) {
-    const value = getAlphaValue(segments.data.charCodeAt(offset)) * 45 + getAlphaValue(segments.data.charCodeAt(offset + 1));
+    const value = getAlphaValue(segment.data.charCodeAt(offset)) * 45 + getAlphaValue(segment.data.charCodeAt(offset + 1));
     appendBits(codewords, value, 11);
     offset += 2;
   }
   if (count % 2 === 1) {
-    appendBits(codewords, getAlphaValue(segments.data.charCodeAt(count - 1)), 6);
+    appendBits(codewords, getAlphaValue(segment.data.charCodeAt(count - 1)), 6);
   }
 }
 
-function appendByte(codewords, segments, size) {
-  let count = segments.data.length;
+function appendByte(codewords, segment, size) {
+  let count = segment.data.length;
   appendBits(codewords, count, CountIndicatorSize[2][size]);
   for (let offset = 0; offset < count; offset++) {
-    appendBits(codewords, segments.data.charCodeAt(offset), 8);
+    appendBits(codewords, segment.data.charCodeAt(offset), 8);
   }
 }
 
-function appendKnaji(codewords, segments, size) {
-  let count = segments.data.length;
+function appendKnaji(codewords, segment, size) {
+  let count = segment.data.length;
   appendBits(codewords, count, CountIndicatorSize[3][size]);
   for (let offset = 0; offset <= count - 2; offset += 2) {
-    let byte = (segments.data.charCodeAt(offset) << 8) | segments.data.charCodeAt(offset + 1);
+    let byte = (segment.data.charCodeAt(offset) << 8) | segment.data.charCodeAt(offset + 1);
     if (byte >= 0x8140 && byte <= 0x9ffc) {
       byte = (byte - 0x8140);
     } else {
@@ -140,28 +140,27 @@ const Codeword = {
     appendECI(codewords, config.ECI);
 
     let size = Size.Large;
-    if (config.fitVersion < SizeVersionRange[Size.Small][1]) {
+    if (config.fitSizeVersion < SizeVersionRange[Size.Small][1]) {
       size = Size.Small;
-    } else if (config.fitVersion < SizeVersionRange[Size.Small][1]) {
+    } else if (config.fitSizeVersion < SizeVersionRange[Size.Small][1]) {
       size = Size.Middle;
     }
 
     segments.forEach((s) => {
       appendBits(codewords, s.mode, 4);
       if (s.mode === Mode.Number) {
-        appendNumber(codewords, segments, size);
+        appendNumber(codewords, s, size);
       } else if (s.mode === Mode.Alpha) {
-        appendAlpha(codewords, segments, size);
+        appendAlpha(codewords, s, size);
       } else if (s.mode === Mode.Byte) {
-        appendByte(codewords, segments, size);
+        appendByte(codewords, s, size);
       } else if (s.mode === Mode.Kanji) {
-        appendKnaji(codewords, segments, size);
+        appendKnaji(codewords, s, size);
       } else {
         throw Error('Wrong Segment Mode: ' + s.mode);
       }
     });
-
-    const capacity = DATA_CODEWORDS[(config.fitVersion - 1) * 4 + config.errorCorrectionLevel];
+    const capacity = DATA_CODEWORDS[(config.fitSizeVersion - 1) * 4 + config.errorCorrectionLevel];
     const paddingWords = Array(capacity - codewords.words.length).fill().map((_, idx) => idx % 2 === 0 ? 0b11101100 : 0b00010001);
     codewords.words = codewords.words.concat(paddingWords);
 

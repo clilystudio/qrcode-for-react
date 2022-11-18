@@ -175,7 +175,7 @@ const ErrorCorrection = {
   generate: function(codewords, config) {
     const codeBlocks = [];
     let start = 0;
-    EC_GROUPS[(config.fitVersion - 1) * 4 + config.errorCorrectionLevel].forEach((ecg) => {
+    EC_GROUPS[(config.fitSizeVersion - 1) * 4 + config.errorCorrectionLevel].forEach((ecg) => {
       for (let g = 0; g < ecg[0]; g++) {
         const block = {data: codewords.data.slice(start, start + ecg[1]), ecSize: ecg[2]};
         ReedSolomon.generate(block);

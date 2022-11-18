@@ -1565,8 +1565,8 @@ function getBestMasked(matrix) {
 
 function init(config) {
   const matrix = {};
-  matrix.version = config.fitVersion;
-  matrix.size = config.fitVersion * 4 + 17;
+  matrix.version = config.fitSizeVersion;
+  matrix.size = config.fitSizeVersion * 4 + 17;
   matrix.errorCorrectionLevel = config.errorCorrectionLevel;
   matrix.mask = config.mask;
   if (matrix.version < 2) {
