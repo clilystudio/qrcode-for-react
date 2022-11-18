@@ -177,7 +177,7 @@ const ErrorCorrection = {
     let start = 0;
     EC_GROUPS[(config.fitSizeVersion - 1) * 4 + config.errorCorrectionLevel].forEach((ecg) => {
       for (let g = 0; g < ecg[0]; g++) {
-        const block = {data: codewords.data.slice(start, start + ecg[1]), ecSize: ecg[2]};
+        const block = {data: codewords.words.slice(start, start + ecg[1]), ecSize: ecg[2]};
         ReedSolomon.generate(block);
         codeBlocks.push(block);
         start += ecg[1];

@@ -1586,6 +1586,7 @@ function init(config) {
       matrix.bits[y][x] = initBits.bytes;
     }
   }
+  return matrix;
 }
 
 const Matrix = {
