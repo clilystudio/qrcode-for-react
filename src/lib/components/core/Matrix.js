@@ -1329,6 +1329,12 @@ function setBit(i, j, bits) {
   bits[j][index] |= (0x1 << offset);
 }
 
+function getBit(i, j, bits) {
+  const index = Math.floor(i / 32);
+  const offset = 31 - (j % 32);
+  return (bits[j][index] | (0x1 << offset)) ? 1 : 0;
+}
+
 function isEncodeRegion(i, j, matrix) {
   if (i === 6 || j === 6) {
     // timing pattern
@@ -1420,7 +1426,69 @@ function placeCordwords(message, matrix) {
 
 function getScore(masked) {
   const len = masked.length;
+  let score = 0;
+  let prevBit = -1;
+  let sameCount = 0;
+  let darkCount = 0;
+  let n3 = 0;
+  // Calculate N1 on Column
+  for (let x = 0; x < len; x++) {
+    let patternBits = 0;
+    for (let y = 0; y < len; y++) {
+      let currBit = getBit(x, y, masked);
+      patternBits = ((patternBits << 1) | currBit) & 0x7ff;
+      if (patternBits === 0x5d || patternBits === 0x5d0) {
+        n3 = 40;
+      }
+      darkCount += (currBit ? 1 : 0);
+      if (currBit === prevBit) {
+        sameCount++;
+      } else {
+        score += (sameCount >= 5 ? sameCount - 2 : 0);
+        sameCount = 1;
+        prevBit = (prevBit + 1) % 2;
+      }
+    }
+    score += (sameCount >= 5 ? sameCount - 2 : 0);
+    prevBit = -1;
+    sameCount = 0;
+  }
+  // Calculate N4
+  score += Math.floor(Math.abs(100 * darkCount / len / len - 50) / 10) * 10;
+  // Calculate N1 on Row
+  for (let y = 0; y < len; y++) {
+    let patternBits = 0;
+    for (let x = 0; x < len; x++) {
+      let currBit = getBit(x, y, masked);
+      patternBits = ((patternBits << 1) | currBit) & 0x7ff;
+      if (patternBits === 0x5d || patternBits === 0x5d0) {
+        n3 = 40;
+      }
+      if (currBit === prevBit) {
+        sameCount++;
+      } else {
+        score += (sameCount >= 5 ? sameCount - 2 : 0);
+        sameCount = 1;
+        prevBit = (prevBit + 1) % 2;
+      }
+    }
+    score += (sameCount >= 5 ? sameCount - 2 : 0);
+    prevBit = -1;
+    sameCount = 0;
+  }
+  // Calculate N3
+  score += n3;
+  // Calculate N2
+  for (let x = 0; x < len - 1; x++) {
+    for (let y = 0; y < len - 1; y++) {
+      let currBit = getBit(x, y, masked);
+      if (currBit === getBit(x + 1, y, masked) && currBit === getBit(x, y + 1, masked) && currBit === getBit(x + 1, y + 1, masked)) {
+        score += 3;
+      }
+    }
+  }
 
+  return score;
 }
 
 function setFormatInfo(masked, errorCorrectionLevel, mask) {
@@ -1490,6 +1558,7 @@ function getBestMasked(matrix) {
     if (maskScore < score) {
       score = maskScore;
       matrix.masked = masked;
+      matrix.mask = mask;
     }
   }
 }
