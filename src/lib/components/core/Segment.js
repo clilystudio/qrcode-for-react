@@ -110,8 +110,8 @@ function optimizeInSize(segments, config, size) {
       if (optSegs[optSegs.length - 1].mode === Mode.Byte) {
         let indexNextByte = indexCurr;
         let countBeforeByte = 0;
-        while (indexNextByte < len && optSegs[indexNextByte].mode !== Mode.Byte) {
-          countBeforeByte += optSegs[indexNextByte].data.length;
+        while (indexNextByte < len && segments[indexNextByte].mode !== Mode.Byte) {
+          countBeforeByte += segments[indexNextByte].data.length;
           indexNextByte++;
         }
         if (segments[indexCurr].mode === Mode.Kanji && (indexNextByte === len || countBeforeByte >= KANJI_LEN[1][size])) {

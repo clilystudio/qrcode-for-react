@@ -6,7 +6,6 @@
   https://opensource.org/licenses/MIT.
 */
 import { CountIndicatorSize, DATA_CODEWORDS, ECI, Mode, Size, SizeVersionRange } from './Const';
-import ErrorCorrection from './ErrorCorrection';
 
 const ALPHA_VALUE = [37, 38, 0, 0, 0, 0, 39, 40, 0, 41, 42, 43];
 
@@ -109,36 +108,10 @@ function appendKnaji(codewords, segment, size) {
   }
 }
 
-function creatMessageSequece(codeBlocks) {
-  const messageSequece = [];
-  let isExist = true;
-  while (isExist) {
-    isExist = false;
-    for (const block of codeBlocks) {
-      if (block.data.legnth > 0) {
-        isExist = true;
-        messageSequece.push(block.data.shift());
-      }
-    }
-  }
-  isExist = true;
-  while (isExist) {
-    isExist = false;
-    for (const block of codeBlocks) {
-      if (block.ecCode.legnth > 0) {
-        isExist = true;
-        messageSequece.push(block.ecCode.shift());
-      }
-    }
-  }
-  return messageSequece;
-}
-
 const Codeword = {
   generate: function (segments, config) {
     const codewords = { words: [0x00], offset: 0 };
-    appendECI(codewords, config.ECI);
-
+    appendECI(codewords, config.eci);
     let size = Size.Large;
     if (config.fitSizeVersion < SizeVersionRange[Size.Small][1]) {
       size = Size.Small;
@@ -163,9 +136,7 @@ const Codeword = {
     const capacity = DATA_CODEWORDS[(config.fitSizeVersion - 1) * 4 + config.errorCorrectionLevel];
     const paddingWords = Array(capacity - codewords.words.length).fill().map((_, idx) => idx % 2 === 0 ? 0b11101100 : 0b00010001);
     codewords.words = codewords.words.concat(paddingWords);
-
-    const codeBlocks = ErrorCorrection.generate(codewords, config);
-    return creatMessageSequece(codeBlocks);
+    return codewords;
   },
 };
 

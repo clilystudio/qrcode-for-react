@@ -9,6 +9,7 @@
 import CharSet from './charset/index';
 import Codeword from './Codeword';
 import { DATA_CODEWORDS } from './Const';
+import ErrorCorrection from './ErrorCorrection';
 import Segment from './Segment';
 
 const ALIGNMENT_POSITIONS = [
@@ -1323,6 +1324,31 @@ function getVersionRange(dataStr, config) {
   return [minVersion, maxVersion];
 }
 
+function creatMessageSequece(codeBlocks) {
+  const messageSequece = [];
+  let isExist = true;
+  while (isExist) {
+    isExist = false;
+    for (const block of codeBlocks) {
+      if (block.data.legnth > 0) {
+        isExist = true;
+        messageSequece.push(block.data.shift());
+      }
+    }
+  }
+  isExist = true;
+  while (isExist) {
+    isExist = false;
+    for (const block of codeBlocks) {
+      if (block.ecCode.legnth > 0) {
+        isExist = true;
+        messageSequece.push(block.ecCode.shift());
+      }
+    }
+  }
+  return messageSequece;
+}
+
 function setBit(i, j, bits) {
   const index = Math.floor(i / 32);
   const offset = 31 - (j % 32);
@@ -1603,7 +1629,9 @@ const Matrix = {
       config.versionRange = [config.version, config.version];
     }
     const segments = Segment.generate(dataStr, config);
-    const message = Codeword.generate(segments, config);
+    const codewords = Codeword.generate(segments, config);
+    const codeBlocks = ErrorCorrection.generate(codewords, config);
+    const message = creatMessageSequece(codeBlocks);
     const matrix = init(config);
     placeCordwords(message, matrix, config);
     if (matrix.mask === undefined) {
