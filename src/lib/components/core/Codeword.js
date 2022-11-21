@@ -11,6 +11,9 @@ const ALPHA_VALUE = [37, 38, 0, 0, 0, 0, 39, 40, 0, 41, 42, 43];
 
 function appendBits(codewords, bits, bitsLen) {
   const paddingLen = 8 - codewords.offset;
+  if (codewords.offset === 0) {
+    codewords.words.push(0x00);
+  }
   if (paddingLen >= bitsLen) {
     codewords.words[codewords.words.length - 1] = codewords.words[codewords.words.length - 1] | (bits << (paddingLen - bitsLen));
     codewords.offset = codewords.offset + bitsLen;
@@ -110,7 +113,7 @@ function appendKnaji(codewords, segment, size) {
 
 const Codeword = {
   generate: function (segments, config) {
-    const codewords = { words: [0x00], offset: 0 };
+    const codewords = { words: [], offset: 0 };
     appendECI(codewords, config.eci);
     let size = Size.Large;
     if (config.fitSizeVersion < SizeVersionRange[Size.Small][1]) {
