@@ -1349,50 +1349,50 @@ function creatMessageSequece(codeBlocks) {
   return messageSequece;
 }
 
-function setBit(i, j, bits) {
-  const index = Math.floor(i / 32);
-  const offset = 31 - (j % 32);
-  bits[j][index] |= (0x1 << offset);
+function setBit(x, y, bits) {
+  const index = Math.floor(x / 32);
+  const offset = 31 - (x % 32);
+  bits[y][index] |= (0x1 << offset);
 }
 
-function getBit(i, j, bits) {
-  const index = Math.floor(i / 32);
-  const offset = 31 - (j % 32);
-  return (bits[j][index] | (0x1 << offset)) ? 1 : 0;
+function getBit(x, y, bits) {
+  const index = Math.floor(x / 32);
+  const offset = 31 - (x % 32);
+  return (bits[y][index] | (0x1 << offset)) ? 1 : 0;
 }
 
-function isEncodeRegion(i, j, matrix, alignments) {
-  if (i === 6 || j === 6) {
+function isEncodeRegion(x, y, size, alignments) {
+  if (x === 6 || y === 6) {
     // timing pattern
     return false;
   }
-  if (i <= 8) {
-    if (j <= 8) {
+  if (x <= 8) {
+    if (y <= 8) {
       // find pattern (topleft) and format information
       return false;
     }
-    if (j >= matrix.size - 8) {
+    if (y >= size - 8) {
       // find pattern (bottomleft) and format information
       return false;
     }
   }
-  if (j <= 8 && i >= matrix.size - 8) {
+  if (y <= 8 && x >= size - 8) {
     // find pattern (topright) and format information
     return false;
   }
-  if (matrix.version >= 7) {
-    if (i < 6 && j >= matrix.size - 11 && j <= matrix.size - 9) {
+  if (size >= 45) {
+    if (x < 6 && y >= size - 11 && y <= size - 9) {
       // version information #1
       return false;
     }
-    if (j < 6 && i >= matrix.size - 11 && i <= matrix.size - 9) {
+    if (y < 6 && x >= size - 11 && x <= size - 9) {
       // version information #2
       return false;
     }
   }
-  for (let x of alignments) {
-    for (let y of alignments) {
-      if (Math.abs(i - x) <= 2 && Math.abs(j - y) <= 2) {
+  for (let ax of alignments) {
+    for (let ay of alignments) {
+      if (Math.abs(x - ax) <= 2 && Math.abs(y - ay) <= 2) {
         // alignment pattern
         return false;
       }
@@ -1402,10 +1402,7 @@ function isEncodeRegion(i, j, matrix, alignments) {
 }
 
 function getNextPos(position, config) {
-  if (position.x === 0 && position.y <= config.size - 9) {
-    return;
-  }
-  if (position.x % 2 === 0) {
+  if ((position.x > 6 && position.x % 2 === 0) || (position.x < 6 && position.x % 2 === 1)) {
     position.x--;
   } else {
     if (position.dir === 0) {
@@ -1432,13 +1429,13 @@ function getNextPos(position, config) {
       }
     }
   }
-  if (!isEncodeRegion(position.x, position.y, config.alignments)) {
+  if (!isEncodeRegion(position.x, position.y, config.size, config.alignments)) {
     getNextPos(position, config);
   }
 }
 
-function placeCordwords(message, matrix, config) {
-  const position = { x: matrix.size - 1, y: matrix.size - 1, dir: 0 };
+function placeCordwords(message, config) {
+  const position = { x: config.size - 1, y: config.size - 1, dir: 0 };
   for (const codeword of message) {
     for (let i = 7; i >= 0; i--) {
       const bit = (codeword >>> i) & 0x1;
@@ -1514,7 +1511,6 @@ function getScore(masked) {
       }
     }
   }
-
   return score;
 }
 
@@ -1547,40 +1543,40 @@ function setFormatInfo(masked, errorCorrectionLevel, mask) {
   }
 }
 
-function shouldMask(i, j, mask) {
-  return (mask === 0 && (i + j) % 2 === 0)
-  || (mask === 1 && i % 2 === 0)
-  || (mask === 2 && j % 3 === 0)
-  || (mask === 3 && (i + j) % 3 === 0)
-  || (mask === 4 && (Math.floor(i / 2) + Math.floor(j / 3)) % 2 === 0)
-  || (mask === 5 && (i * j) % 2 + (i * j) % 3 === 0)
-  || (mask === 6 && (i * j + (i * j) % 3) % 2 === 0)
-  || (mask === 7 && (i + j + (i * j) % 3) % 2 === 0);
+function shouldMask(x, y, mask) {
+  return (mask === 0 && (x + y) % 2 === 0)
+  || (mask === 1 && y % 2 === 0)
+  || (mask === 2 && x % 3 === 0)
+  || (mask === 3 && (x + y) % 3 === 0)
+  || (mask === 4 && (Math.floor(y / 2) + Math.floor(x / 3)) % 2 === 0)
+  || (mask === 5 && (x * y) % 2 + (x * y) % 3 === 0)
+  || (mask === 6 && (x * y + (x * y) % 3) % 2 === 0)
+  || (mask === 7 && (x + x + (x * y) % 3) % 2 === 0);
 }
 
-function getSymbol(matrix, mask, config) {
+function getSymbol(mask, config) {
   const len = Math.ceil(config.size / 32);
   const masked = Array(config.size).fill().map(_ => new Uint32Array(len));
   for (let x = 0; x < config.size; x++) {
     for (let y = 0; y < config.size; y++) {
-      if (shouldMask(x, y, mask) && isEncodeRegion(x, y, matrix, config.alignments)) {
+      if (shouldMask(x, y, mask) && isEncodeRegion(x, y, config.size, config.alignments)) {
         setBit(x, y, masked);
       }
     }
   }
   for (let x = 0; x < len; x++) {
-    for (let y = 0; y < matrix.size; y++) {
-      masked[y][x] ^= matrix.bits[y][x];
+    for (let y = 0; y < config.size; y++) {
+      masked[y][x] ^= config.bits[y][x];
     }
   }
-  setFormatInfo(masked, matrix.errorCorrectionLevel, mask);
+  setFormatInfo(masked, config.errorCorrectionLevel, mask);
   return masked;
 }
 
 function getBestSymbol(matrix, config) {
   let score = Number.MAX_VALUE;
   for (let mask = 0; mask < 8; mask++) {
-    const masked = getSymbol(matrix, mask, config);
+    const masked = getSymbol(mask, config);
     let maskScore = getScore(masked);
     if (maskScore < score) {
       score = maskScore;
@@ -1594,7 +1590,6 @@ function init(config) {
   const matrix = {};
   matrix.version = config.fitSizeVersion;
   config.size = config.fitSizeVersion * 4 + 17;
-  matrix.errorCorrectionLevel = config.errorCorrectionLevel;
   matrix.mask = config.mask;
   if (matrix.version < 2) {
     config.alignments = [];
@@ -1632,13 +1627,12 @@ const Matrix = {
     const codewords = Codeword.generate(segments, config);
     const codeBlocks = ErrorCorrection.generate(codewords, config);
     const message = creatMessageSequece(codeBlocks);
-    console.log(message);
     const matrix = init(config);
-    placeCordwords(message, matrix, config);
+    placeCordwords(message, config);
     if (matrix.mask === undefined) {
       getBestSymbol(matrix, config);
     } else {
-      matrix.symbol = getSymbol(matrix, matrix.mask, config);
+      matrix.symbol = getSymbol(matrix.mask, config);
     }
     return matrix;
   },
