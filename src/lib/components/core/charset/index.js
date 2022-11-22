@@ -1,3 +1,11 @@
+/*
+  Copyright 2022 Clily Studio
+
+  Use of this source code is governed by an MIT-style
+  license that can be found in the LICENSE file or at
+  https://opensource.org/licenses/MIT.
+*/
+
 import { ECI } from '../Const';
 import BIG5 from './Big5';
 import CP1250 from './CP1250';
