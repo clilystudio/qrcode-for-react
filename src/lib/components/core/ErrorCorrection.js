@@ -179,7 +179,6 @@ const ErrorCorrection = {
       for (let g = 0; g < ecg[0]; g++) {
         const block = {data: codewords.words.slice(start, start + ecg[1]), ecSize: ecg[2]};
         ReedSolomon.generate(block);
-        console.log(block);
         codeBlocks.push(block);
         start += ecg[1];
       }

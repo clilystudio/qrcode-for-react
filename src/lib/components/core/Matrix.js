@@ -1330,7 +1330,7 @@ function creatMessageSequece(codeBlocks) {
   while (isExist) {
     isExist = false;
     for (const block of codeBlocks) {
-      if (block.data.legnth > 0) {
+      if (block.data.length > 0) {
         isExist = true;
         messageSequece.push(block.data.shift());
       }
@@ -1340,7 +1340,7 @@ function creatMessageSequece(codeBlocks) {
   while (isExist) {
     isExist = false;
     for (const block of codeBlocks) {
-      if (block.ecCode.legnth > 0) {
+      if (block.ecCode.length > 0) {
         isExist = true;
         messageSequece.push(block.ecCode.shift());
       }
@@ -1632,6 +1632,7 @@ const Matrix = {
     const codewords = Codeword.generate(segments, config);
     const codeBlocks = ErrorCorrection.generate(codewords, config);
     const message = creatMessageSequece(codeBlocks);
+    console.log(message);
     const matrix = init(config);
     placeCordwords(message, matrix, config);
     if (matrix.mask === undefined) {
