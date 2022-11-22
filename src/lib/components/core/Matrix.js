@@ -1535,9 +1535,15 @@ function setFormatInfo(masked, errorCorrectionLevel, mask) {
     }
     bitMask = bitMask << 1;
   }
-  for (let offset = 8; offset <= 14; offset++) {
+
+  setBit(7, 8, masked);
+  setBit(8, len - 7, masked);
+  bitMask = bitMask << 1;
+
+  for (let offset = 9; offset <= 14; offset++) {
     if (formatInfo & bitMask) {
-      setBit(8, offset - 15 + offset, masked);
+      setBit(14 - offset, 8, masked);
+      setBit(8, len - 15 + offset, masked);
     }
     bitMask = bitMask << 1;
   }
@@ -1564,12 +1570,15 @@ function getSymbol(mask, config) {
       }
     }
   }
+  console.log('#' + mask);
+  console.log(masked);
   for (let x = 0; x < len; x++) {
     for (let y = 0; y < config.size; y++) {
       masked[y][x] ^= config.bits[y][x];
     }
   }
   setFormatInfo(masked, config.errorCorrectionLevel, mask);
+  console.log(masked);
   return masked;
 }
 
