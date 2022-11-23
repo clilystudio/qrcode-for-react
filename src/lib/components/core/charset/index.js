@@ -21,17 +21,17 @@ import USASCII from './USASCII';
 import UTF16BE from './UTF16BE';
 import UTF8 from './UTF8';
 
-const getMappingByte = function(charCode, mappingArray) {
+const getMappingByte = function (charCode, mappingArray) {
   let len = mappingArray.length;
   if (charCode < mappingArray[0].charCode || charCode > mappingArray[len - 1].charCode) {
     return undefined;
   }
   const mapping = mappingArray.find((x) => x.charCode === charCode);
   return (mapping ? mapping.byte : undefined);
-}
+};
 
 const CharSet = {
-  convert: function(data, eci) {
+  convert: function (data, eci) {
     if (eci === ECI.CP437_0 || eci === ECI.CP437_1) {
       return CP437.convert(data, getMappingByte);
     } else if (eci === ECI.ISO_8859_1_0 || eci === ECI.ISO_8859_1_1) {
@@ -64,7 +64,7 @@ const CharSet = {
       throw Error('Unknown ECI Assignment Value: ' + eci);
     }
   },
-}
+};
 
 export default CharSet;
 

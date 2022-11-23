@@ -10,7 +10,7 @@
  * Convert String to UTF-8
  */
 const UTF8 = {
-  convert: function(data) {
+  convert: function (data) {
     const bytes = [];
     const len = data.length;
     let i = 0;
