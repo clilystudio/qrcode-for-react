@@ -16,6 +16,6 @@ const QRCodeCanvas = (props) => {
             <h4>{props.data || ''}</h4>
         </div>
     );
-}
+};
 
 export default QRCodeCanvas;

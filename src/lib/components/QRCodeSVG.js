@@ -14,6 +14,6 @@ const QRCodeSVG = (props) => {
             <h4>{props.data || ''}</h4>
         </div>
     );
-}
+};
 
 export default QRCodeSVG;
