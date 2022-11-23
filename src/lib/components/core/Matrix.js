@@ -1551,13 +1551,13 @@ function setFormatInfo(masked, errorCorrectionLevel, mask) {
 
 function shouldMask(x, y, mask) {
   return (mask === 0 && (x + y) % 2 === 0)
-  || (mask === 1 && y % 2 === 0)
-  || (mask === 2 && x % 3 === 0)
-  || (mask === 3 && (x + y) % 3 === 0)
-  || (mask === 4 && (Math.floor(y / 2) + Math.floor(x / 3)) % 2 === 0)
-  || (mask === 5 && (x * y) % 2 + (x * y) % 3 === 0)
-  || (mask === 6 && (x * y + (x * y) % 3) % 2 === 0)
-  || (mask === 7 && (x + x + (x * y) % 3) % 2 === 0);
+    || (mask === 1 && y % 2 === 0)
+    || (mask === 2 && x % 3 === 0)
+    || (mask === 3 && (x + y) % 3 === 0)
+    || (mask === 4 && (Math.floor(y / 2) + Math.floor(x / 3)) % 2 === 0)
+    || (mask === 5 && (x * y) % 2 + (x * y) % 3 === 0)
+    || (mask === 6 && (x * y + (x * y) % 3) % 2 === 0)
+    || (mask === 7 && (x + x + (x * y) % 3) % 2 === 0);
 }
 
 function getSymbol(mask, config) {
@@ -1570,8 +1570,6 @@ function getSymbol(mask, config) {
       }
     }
   }
-  console.log('#' + mask);
-  console.log(masked);
   for (let x = 0; x < len; x++) {
     for (let y = 0; y < config.size; y++) {
       masked[y][x] ^= config.bits[y][x];

@@ -9,16 +9,16 @@
 import ReedSolomon from './ReedSolomon';
 
 const EC_GROUPS = [
-  [[1, 16, 10 ]],
-  [[1, 19, 7 ]],
-  [[1, 9, 17 ]],
-  [[1, 13, 13 ]],
-  [[1, 28, 16 ]],
-  [[1, 34, 10 ]],
-  [[1, 16, 28 ]],
-  [[1, 22, 22 ]],
-  [[1, 44, 26 ]],
-  [[1, 55, 15 ]],
+  [[1, 16, 10]],
+  [[1, 19, 7]],
+  [[1, 9, 17]],
+  [[1, 13, 13]],
+  [[1, 28, 16]],
+  [[1, 34, 10]],
+  [[1, 16, 28]],
+  [[1, 22, 22]],
+  [[1, 44, 26]],
+  [[1, 55, 15]],
   [[2, 13, 22]],
   [[2, 17, 18]],
   [[2, 32, 18]],
@@ -172,12 +172,12 @@ const EC_GROUPS = [
 ];
 
 const ErrorCorrection = {
-  generate: function(codewords, config) {
+  generate: function (codewords, config) {
     const codeBlocks = [];
     let start = 0;
     EC_GROUPS[(config.fitSizeVersion - 1) * 4 + config.errorCorrectionLevel].forEach((ecg) => {
       for (let g = 0; g < ecg[0]; g++) {
-        const block = {data: codewords.words.slice(start, start + ecg[1]), ecSize: ecg[2]};
+        const block = { data: codewords.words.slice(start, start + ecg[1]), ecSize: ecg[2] };
         ReedSolomon.generate(block);
         codeBlocks.push(block);
         start += ecg[1];
