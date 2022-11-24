@@ -136,4 +136,3 @@ const DATA_CODEWORDS = [
 ];
 
 export { ErrorCorrectionLevel, ECI, Size, SizeVersionRange, CountIndicatorSize, Mode, KANJI_LEN, ALPHA_LEN, NUMBER_LEN, DATA_CODEWORDS };
-

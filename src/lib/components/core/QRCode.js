@@ -23,7 +23,7 @@ const QRCode = {
     config.version = config.version || 0;
     config.eci = config.eci === undefined ? ECI.DEFAULT : config.eci;
     config.eciConv = config.eciConv === undefined ? true : config.eciConv;
-    config.errorCorrectionLevel = config.errorCorrectionLevel === undefined ? ErrorCorrectionLevel.L : config.errorCorrectionLevel;
+    config.errorCorrectionLevel = config.errorCorrectionLevel === undefined ? ErrorCorrectionLevel.M : config.errorCorrectionLevel;
     checkConfig(config);
     return Matrix.generate(data, config);
   },

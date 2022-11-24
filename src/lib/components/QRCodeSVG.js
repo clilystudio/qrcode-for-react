@@ -7,8 +7,11 @@
 */
 
 import React from 'react';
+import QRCode from './core/QRCode';
 
 const QRCodeSVG = (props) => {
+  const matrix = QRCode.generate(props.data, props.config);
+
     return (
         <div className="qrcode-svg">
             <h4>{props.data || ''}</h4>
