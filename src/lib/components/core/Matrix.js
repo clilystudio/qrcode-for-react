@@ -1536,8 +1536,10 @@ function setFormatInfo(masked, errorCorrectionLevel, mask) {
     bitMask = bitMask << 1;
   }
 
-  setBit(7, 8, masked);
-  setBit(8, len - 7, masked);
+  if (formatInfo & bitMask) {
+    setBit(7, 8, masked);
+    setBit(8, len - 7, masked);
+  }
   bitMask = bitMask << 1;
 
   for (let offset = 9; offset <= 14; offset++) {

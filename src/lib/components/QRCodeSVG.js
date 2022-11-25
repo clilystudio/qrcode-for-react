@@ -10,12 +10,22 @@ import React from 'react';
 import QRCode from './core/QRCode';
 
 const QRCodeSVG = (props) => {
-  const matrix = QRCode.generate(props.data, props.config);
   const darkColor = props.config.dark === undefined ? 'black' : props.config.dark;
   const lightColor = props.config.light === undefined ? 'white' : props.config.light;
+  const matrix = QRCode.generate(props.data, props.config);
+  const size = matrix.version * 4 + 17;
+  const symbolSize = size + 8;
+  const modules = [];
+  for (let x = 0; x < size; x++) {
+    for (let y = 0; y < size; y++) {
+      if (matrix.getBit(x, y)) {
+        modules.push(<rect x={x + 4} y={y + 4} width="1" height="1" class="qrcode-module dark" />);
+      }
+    }
+  }
   return (
     <div className="qrcode-svg">
-      <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 177 177">
+      <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox={'0 0 ' + symbolSize + ' ' + symbolSize}>
         <defs>
             <style type="text/css">
               {`
@@ -33,9 +43,7 @@ const QRCodeSVG = (props) => {
             </style>
         </defs>
         <rect width="100%" height="100%" class="qrcode-module light" />
-        <rect x="10" y="10" width="30" height="30" class="qrcode-module dark" />
-        <rect x="10" y="40" width="30" height="30" class="qrcode-module dark" />
-        <rect x="40" y="40" width="30" height="30" class="qrcode-module dark" />
+        {modules}
       </svg>
     </div>
   );
