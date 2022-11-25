@@ -7,7 +7,7 @@ test('QRCodeTest1', () => {
     eci: 3,
     eciConv: false,
     errorCorrectionLevel: 0,
-    mask: 2,
+    // mask: 2,
   };
   const matrix = QRCode.generate(data,config);
   console.log(matrix);

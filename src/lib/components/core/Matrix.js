@@ -1301,6 +1301,16 @@ const FORMAT_INFO_BITS = [
   0x355f, 0x3068, 0x3f31, 0x3a06, 0x24b4, 0x2183, 0x2eda, 0x2bed,
 ];
 
+const VERSION_INFO_BITS = [
+  0x07c94, 0x085bc, 0x09a99, 0x0a4d3, 0x0bbf6,
+  0x0c762, 0x0d847, 0x0e60d, 0x0f928, 0x10b78,
+  0x1145d, 0x12a17, 0x13532, 0x149a6, 0x15683,
+  0x168c9, 0x177ec, 0x18ec4, 0x191e1, 0x1afab,
+  0x1b08e, 0x1cc1a, 0x1d33f, 0x1ed75, 0x1f250,
+  0x209d5, 0x216f0, 0x228ba, 0x2379f, 0x24b0b,
+  0x2542e, 0x26a64, 0x27541, 0x28c69,
+];
+
 function getVersionRange(dataStr, config) {
   let minBitsCount = 4 + 10 + 10 * Math.floor(dataStr.length / 3) + (dataStr.length % 3 === 0 ? 0 : (dataStr.length % 3 === 1 ? 4 : 7));
   let maxBitsCount = 28 + 4 + 16 + dataStr.length * 8;
@@ -1457,10 +1467,12 @@ function getScore(masked) {
   // Calculate N1 on Column
   for (let x = 0; x < len; x++) {
     let patternBits = 0;
+    let patternCount = 0;
     for (let y = 0; y < len; y++) {
       let currBit = getBit(x, y, masked);
       patternBits = ((patternBits << 1) | currBit) & 0x7ff;
-      if (patternBits === 0x5d || patternBits === 0x5d0) {
+      patternCount++;
+      if (patternCount >=11 && (patternBits === 0x5d || patternBits === 0x5d0)) {
         n3 = 40;
       }
       darkCount += (currBit ? 1 : 0);
@@ -1482,10 +1494,12 @@ function getScore(masked) {
   // Calculate N1 on Row
   for (let y = 0; y < len; y++) {
     let patternBits = 0;
+    let patternCount = 0;
     for (let x = 0; x < len; x++) {
       let currBit = getBit(x, y, masked);
       patternBits = ((patternBits << 1) | currBit) & 0x7ff;
-      if (patternBits === 0x5d || patternBits === 0x5d0) {
+      patternCount++;
+      if (patternCount >=11 && (patternBits === 0x5d || patternBits === 0x5d0)) {
         n3 = 40;
       }
       if (currBit === prevBit) {
@@ -1551,6 +1565,21 @@ function setFormatInfo(masked, errorCorrectionLevel, mask) {
   }
 }
 
+function setVersionInfo(masked, version) {
+  const versionInfo = VERSION_INFO_BITS[version - 7];
+  const len = masked.length;
+  let bitMask = 1;
+  for (let i = 0; i < 6; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (versionInfo & bitMask) {
+        setBit(i, len - 11 + j, masked);
+        setBit(len - 11 + j, i, masked);
+      }
+      bitMask = bitMask << 1;
+    }
+  }
+}
+
 function shouldMask(x, y, mask) {
   return (mask === 0 && (x + y) % 2 === 0)
     || (mask === 1 && y % 2 === 0)
@@ -1578,6 +1607,9 @@ function getSymbol(mask, config) {
     }
   }
   setFormatInfo(masked, config.errorCorrectionLevel, mask);
+  if (config.fitSizeVersion >= 7) {
+    setVersionInfo(masked, config.fitSizeVersion);
+  }
   return masked;
 }
 
@@ -1586,6 +1618,7 @@ function getBestSymbol(matrix, config) {
   for (let mask = 0; mask < 8; mask++) {
     const masked = getSymbol(mask, config);
     let maskScore = getScore(masked);
+    console.log('mask=' + mask + ' score=' + maskScore);
     if (maskScore < score) {
       score = maskScore;
       matrix.symbol = masked;
