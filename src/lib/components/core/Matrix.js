@@ -1565,21 +1565,6 @@ function setFormatInfo(masked, errorCorrectionLevel, mask) {
   }
 }
 
-function setVersionInfo(masked, version) {
-  const versionInfo = VERSION_INFO_BITS[version - 7];
-  const len = masked.length;
-  let bitMask = 1;
-  for (let i = 0; i < 6; i++) {
-    for (let j = 0; j < 3; j++) {
-      if (versionInfo & bitMask) {
-        setBit(i, len - 11 + j, masked);
-        setBit(len - 11 + j, i, masked);
-      }
-      bitMask = bitMask << 1;
-    }
-  }
-}
-
 function shouldMask(x, y, mask) {
   return (mask === 0 && (x + y) % 2 === 0)
     || (mask === 1 && y % 2 === 0)
@@ -1607,9 +1592,6 @@ function getSymbol(mask, config) {
     }
   }
   setFormatInfo(masked, config.errorCorrectionLevel, mask);
-  if (config.fitSizeVersion >= 7) {
-    setVersionInfo(masked, config.fitSizeVersion);
-  }
   return masked;
 }
 
