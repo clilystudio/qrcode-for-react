@@ -1576,7 +1576,6 @@ function getSymbol(mask, config) {
     }
   }
   setFormatInfo(masked, config.errorCorrectionLevel, mask);
-  console.log(masked);
   return masked;
 }
 
@@ -1598,12 +1597,13 @@ function init(config) {
   matrix.version = config.fitSizeVersion;
   config.size = config.fitSizeVersion * 4 + 17;
   matrix.mask = config.mask;
+  matrix.errorCorrectionLevel = config.errorCorrectionLevel;
   if (matrix.version < 2) {
     config.alignments = [];
   } else if (matrix.version < 7) {
-    config.alignments = [6, matrix.size - 7];
+    config.alignments = [6, config.size - 7];
   } else {
-    config.alignments = [6, ...ALIGNMENT_POSITIONS[matrix.version - 7], matrix.size - 7];
+    config.alignments = [6, ...ALIGNMENT_POSITIONS[matrix.version - 7], config.size - 7];
   }
   const len = Math.ceil(config.size / 32);
   config.bits = Array(config.size).fill().map(_ => new Uint32Array(len));
@@ -1641,6 +1641,9 @@ const Matrix = {
     } else {
       matrix.symbol = getSymbol(matrix.mask, config);
     }
+    matrix.getBit = function(x, y) {
+      return getBit(x, y, this.symbol);
+    };
     return matrix;
   },
 };
