@@ -1358,7 +1358,7 @@ function setBit(x, y, bits) {
 function getBit(x, y, bits) {
   const index = Math.floor(x / 32);
   const offset = 31 - (x % 32);
-  return (bits[y][index] | (0x1 << offset)) ? 1 : 0;
+  return (bits[y][index] & (0x1 << offset)) ? 1 : 0;
 }
 
 function isEncodeRegion(x, y, size, alignments) {
