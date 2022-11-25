@@ -5,6 +5,7 @@
   license that can be found in the LICENSE file or at
   https://opensource.org/licenses/MIT.
 */
+
 import { CountIndicatorSize, DATA_CODEWORDS, ECI, Mode, Size, SizeVersionRange } from './Const';
 
 const ALPHA_VALUE = [37, 38, 0, 0, 0, 0, 39, 40, 0, 41, 42, 43];
