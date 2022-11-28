@@ -1390,11 +1390,16 @@ function isEncodeRegion(x, y, size, alignments) {
       return false;
     }
   }
-  for (let ax of alignments) {
-    for (let ay of alignments) {
-      if (Math.abs(x - ax) <= 2 && Math.abs(y - ay) <= 2) {
-        // alignment pattern
-        return false;
+  const len = alignments.length;
+  for (let i = 0; i < len; i++) {
+    for (let j = 0; j < len; j++) {
+      if ((i === 0 && j ===0) || (i === 0 && j === len - 1) || (i === len - 1 && j === 0)) {
+        // top-left, top-right, left-bottom no alignment
+      } else {
+        if (Math.abs(x - alignments[i]) <= 2 && Math.abs(y - alignments[j]) <= 2) {
+          // alignment pattern
+          return false;
+        }
       }
     }
   }
@@ -1436,8 +1441,14 @@ function getNextPos(position, config) {
 
 function placeCordwords(message, config) {
   const position = { x: config.size - 1, y: config.size - 1, dir: 0 };
+  console.log(config.alignments);
+  let codeCnt = 0;
   for (const codeword of message) {
+    codeCnt++;
     for (let i = 7; i >= 0; i--) {
+      if (codeCnt === 17) {
+        console.log(position);
+      }
       const bit = (codeword >>> i) & 0x1;
       if (bit) {
         setBit(position.x, position.y, config.bits);
