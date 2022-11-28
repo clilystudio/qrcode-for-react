@@ -1301,16 +1301,6 @@ const FORMAT_INFO_BITS = [
   0x355f, 0x3068, 0x3f31, 0x3a06, 0x24b4, 0x2183, 0x2eda, 0x2bed,
 ];
 
-const VERSION_INFO_BITS = [
-  0x07c94, 0x085bc, 0x09a99, 0x0a4d3, 0x0bbf6,
-  0x0c762, 0x0d847, 0x0e60d, 0x0f928, 0x10b78,
-  0x1145d, 0x12a17, 0x13532, 0x149a6, 0x15683,
-  0x168c9, 0x177ec, 0x18ec4, 0x191e1, 0x1afab,
-  0x1b08e, 0x1cc1a, 0x1d33f, 0x1ed75, 0x1f250,
-  0x209d5, 0x216f0, 0x228ba, 0x2379f, 0x24b0b,
-  0x2542e, 0x26a64, 0x27541, 0x28c69,
-];
-
 function getVersionRange(dataStr, config) {
   let minBitsCount = 4 + 10 + 10 * Math.floor(dataStr.length / 3) + (dataStr.length % 3 === 0 ? 0 : (dataStr.length % 3 === 1 ? 4 : 7));
   let maxBitsCount = 28 + 4 + 16 + dataStr.length * 8;
@@ -1638,7 +1628,8 @@ const Matrix = {
     let dataStr = data;
     if (config.eciConv) {
       const byteArray = CharSet.convert(data, config.eci);
-      dataStr = String.fromCharCode(byteArray);
+      dataStr = String.fromCharCode(...byteArray);
+      console.log('#dataStr:' + dataStr);
     }
     if (config.version === 0) {
       config.versionRange = getVersionRange(dataStr, config);
@@ -1646,6 +1637,7 @@ const Matrix = {
       config.versionRange = [config.version, config.version];
     }
     const segments = Segment.generate(dataStr, config);
+    console.log(segments);
     const codewords = Codeword.generate(segments, config);
     const codeBlocks = ErrorCorrection.generate(codewords, config);
     const message = creatMessageSequece(codeBlocks);
