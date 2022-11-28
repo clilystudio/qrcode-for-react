@@ -11,5 +11,5 @@ test('QRCodeTest1', () => {
   };
   const matrix = QRCode.generate(data,config);
   console.log(matrix);
-  console.log(matrix.getBit(1, 1));
+  console.log(config);
 });
