@@ -19,7 +19,7 @@ function App() {
           Learn React
         </a>
         <QRCodeCanvas data={'01234567'} config={{}} />
-        <QRCodeSVG data={'01234567'} config={{version: 2, errorCorrectionLevel: 0, mask: 2}} />
+        <QRCodeSVG data={'01234567'} config={{version: 7, errorCorrectionLevel: 0, mask: 2}} />
       </header>
     </div>
   );
