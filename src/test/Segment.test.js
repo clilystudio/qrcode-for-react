@@ -18,14 +18,14 @@ test('Seg1', () => {
 });
 
 test('Seg2', () => {
-  let data = '012';
+  let data = '01234567';
   let config = {
-    version: 1,
+    version: 2,
     eci: 3,
     eciConv: false,
     errorCorrectionLevel: 0,
-    versionRange: [ 1, 1 ],
-    fitSizeVersion: 1,
+    versionRange: [ 2, 2 ],
+    fitSizeVersion: 2,
     size: 21,
     mask: 0,
   };

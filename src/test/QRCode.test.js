@@ -16,9 +16,9 @@ test('QR1', () => {
 
 
 test('QR2', () => {
-  let data = '012';
+  let data = '01234567';
   let config = {
-    version: 1,
+    version: 2,
     errorCorrectionLevel: 0,
     mask: 0,
   };
