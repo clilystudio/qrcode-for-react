@@ -1463,19 +1463,19 @@ function getScore(masked) {
   let prevBit = -1;
   let sameCount = 0;
   let darkCount = 0;
-  let n3 = 0;
-  // Calculate N1 on Column
-  for (let x = 0; x < len; x++) {
+  // Calculate N1 on Row
+  for (let y = 0; y < len; y++) {
     let patternBits = 0;
     let patternCount = 0;
-    for (let y = 0; y < len; y++) {
+    for (let x = 0; x < len; x++) {
       let currBit = getBit(x, y, masked);
+      darkCount += currBit;
       patternBits = ((patternBits << 1) | currBit) & 0x7ff;
       patternCount++;
       if (patternCount >=11 && (patternBits === 0x5d || patternBits === 0x5d0)) {
-        n3 = 40;
+        // Calculate N3
+        score += 40;
       }
-      darkCount += (currBit ? 1 : 0);
       if (currBit === prevBit) {
         sameCount++;
       } else {
@@ -1491,16 +1491,17 @@ function getScore(masked) {
   // Calculate N4
   const total = len * len;
   score += Math.floor(10 * Math.abs(2 * darkCount - total) / total) * 10;
-  // Calculate N1 on Row
-  for (let y = 0; y < len; y++) {
+  // Calculate N1 on Column
+  for (let x = 0; x < len; x++) {
     let patternBits = 0;
     let patternCount = 0;
-    for (let x = 0; x < len; x++) {
+    for (let y = 0; y < len; y++) {
       let currBit = getBit(x, y, masked);
       patternBits = ((patternBits << 1) | currBit) & 0x7ff;
       patternCount++;
       if (patternCount >=11 && (patternBits === 0x5d || patternBits === 0x5d0)) {
-        n3 = 40;
+        // Calculate N3
+        score += 40;
       }
       if (currBit === prevBit) {
         sameCount++;
@@ -1514,8 +1515,6 @@ function getScore(masked) {
     prevBit = -1;
     sameCount = 0;
   }
-  // Calculate N3
-  score += n3;
   // Calculate N2
   for (let x = 0; x < len - 1; x++) {
     for (let y = 0; y < len - 1; y++) {
@@ -1600,7 +1599,6 @@ function getBestSymbol(matrix, config) {
   for (let mask = 0; mask < 8; mask++) {
     const masked = getSymbol(mask, config);
     let maskScore = getScore(masked);
-    console.log('mask=' + mask + ' score=' + maskScore);
     if (maskScore < score) {
       score = maskScore;
       matrix.symbol = masked;
