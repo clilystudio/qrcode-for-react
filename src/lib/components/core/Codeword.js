@@ -138,6 +138,9 @@ const Codeword = {
       }
     });
     const capacity = DATA_CODEWORDS[(config.fitSizeVersion - 1) * 4 + config.errorCorrectionLevel];
+    if (codewords.offset <= 4 || capacity > codewords.words.length) {
+      appendBits(codewords, 0, 4);
+    }
     const paddingWords = Array(capacity - codewords.words.length).fill().map((_, idx) => idx % 2 === 0 ? 0b11101100 : 0b00010001);
     codewords.words = codewords.words.concat(paddingWords);
     return codewords;

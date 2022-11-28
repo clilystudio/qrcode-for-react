@@ -1636,7 +1636,6 @@ const Matrix = {
       config.versionRange = [config.version, config.version];
     }
     const segments = Segment.generate(dataStr, config);
-    console.log(segments);
     const codewords = Codeword.generate(segments, config);
     const codeBlocks = ErrorCorrection.generate(codewords, config);
     const message = creatMessageSequece(codeBlocks);
