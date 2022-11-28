@@ -1629,7 +1629,6 @@ const Matrix = {
     if (config.eciConv) {
       const byteArray = CharSet.convert(data, config.eci);
       dataStr = String.fromCharCode(...byteArray);
-      console.log('#dataStr:' + dataStr);
     }
     if (config.version === 0) {
       config.versionRange = getVersionRange(dataStr, config);
