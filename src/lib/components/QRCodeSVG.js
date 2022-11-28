@@ -19,7 +19,7 @@ const QRCodeSVG = (props) => {
   for (let x = 0; x < size; x++) {
     for (let y = 0; y < size; y++) {
       if (matrix.getBit(x, y)) {
-        modules.push(<rect x={x + 4} y={y + 4} width="1" height="1" class="qrcode-module dark" />);
+        modules.push(<rect x={x + 4} y={y + 4} width="1" height="1" className="qrcode-module dark" key={x * size + y} />);
       }
     }
   }
@@ -42,7 +42,7 @@ const QRCodeSVG = (props) => {
               `}
             </style>
         </defs>
-        <rect width="100%" height="100%" class="qrcode-module light" />
+        <rect width="100%" height="100%" className="qrcode-module light" />
         {modules}
       </svg>
     </div>
