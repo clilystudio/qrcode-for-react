@@ -6,7 +6,6 @@
   https://opensource.org/licenses/MIT.
 */
 
-import QRCodeCanvas from './components/QRCodeCanvas';
 import QRCodeSVG from './components/QRCodeSVG';
 
-export { QRCodeSVG, QRCodeCanvas };
+export { QRCodeSVG };

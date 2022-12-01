@@ -1,5 +1,5 @@
 import './App.css';
-import { QRCodeCanvas, QRCodeSVG } from './lib';
+import { QRCodeSVG } from './lib';
 import logo from './logo.svg';
 
 function App() {
@@ -18,7 +18,6 @@ function App() {
         >
           Learn React
         </a>
-        <QRCodeCanvas data={'01234567'} config={{}} />
         <QRCodeSVG data={'01234567'} config={{version: 7, errorCorrectionLevel: 0, mask: 2}} />
       </header>
     </div>
