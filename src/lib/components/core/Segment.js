@@ -204,19 +204,24 @@ function optimizeSegments(segments, config) {
 
 const Segment = {
   generate: function (dataStr, config) {
-    const segments = [];
-    const len = dataStr.length;
-    let offset = 0;
-    while (offset < len) {
-      const segment = getSegment(dataStr, offset);
-      if (segments.length > 0 && segment.mode === segments[segments.length - 1].mode) {
-        segments[segments.length - 1].data = segments[segments.length - 1].data + segment.data;
-      } else {
-        segments.push(segment);
+    if (config.mode === Mode.AutoDetect) {
+      const segments = [];
+      const len = dataStr.length;
+      let offset = 0;
+      while (offset < len) {
+        const segment = getSegment(dataStr, offset);
+        if (segments.length > 0 && segment.mode === segments[segments.length - 1].mode) {
+          segments[segments.length - 1].data = segments[segments.length - 1].data + segment.data;
+        } else {
+          segments.push(segment);
+        }
+        offset += segment.data.length;
       }
-      offset += segment.data.length;
+      return optimizeSegments(segments, config);
+    } else {
+      config.fitSizeVersion = config.version;
+      return [{ mode: config.mode, data: dataStr }];
     }
-    return optimizeSegments(segments, config);
   },
 };
 

@@ -6,7 +6,7 @@
   https://opensource.org/licenses/MIT.
 */
 
-import { ECI, ErrorCorrectionLevel } from './Const';
+import { ECI, ErrorCorrectionLevel, Mode } from './Const';
 import Matrix from './Matrix';
 
 function checkConfig(config) {
@@ -23,6 +23,7 @@ const QRCode = {
     config.version = config.version || 0;
     config.eci = config.eci === undefined ? ECI.DEFAULT : config.eci;
     config.eciConv = config.eciConv === undefined ? true : config.eciConv;
+    config.mode = config.mode === undefined ? Mode.AutoDetect : config.mode;
     config.errorCorrectionLevel = config.errorCorrectionLevel === undefined ? ErrorCorrectionLevel.M : config.errorCorrectionLevel;
     checkConfig(config);
     return Matrix.generate(data, config);

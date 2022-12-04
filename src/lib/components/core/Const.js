@@ -66,6 +66,7 @@ const CountIndicatorSize = [
 ];
 
 const Mode = {
+  AutoDetect: 0b0000,
   Number: 0b0001,
   Alpha: 0b0010,
   Byte: 0b0100,
@@ -136,3 +137,4 @@ const DATA_CODEWORDS = [
 ];
 
 export { ErrorCorrectionLevel, ECI, Size, SizeVersionRange, CountIndicatorSize, Mode, KANJI_LEN, ALPHA_LEN, NUMBER_LEN, DATA_CODEWORDS };
+
