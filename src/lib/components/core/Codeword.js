@@ -119,7 +119,7 @@ const Codeword = {
     let size = Size.Large;
     if (config.fitSizeVersion < SizeVersionRange[Size.Small][1]) {
       size = Size.Small;
-    } else if (config.fitSizeVersion < SizeVersionRange[Size.Small][1]) {
+    } else if (config.fitSizeVersion < SizeVersionRange[Size.Middle][1]) {
       size = Size.Middle;
     }
 
