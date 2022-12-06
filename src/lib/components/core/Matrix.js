@@ -1441,14 +1441,8 @@ function getNextPos(position, config) {
 
 function placeCordwords(message, config) {
   const position = { x: config.size - 1, y: config.size - 1, dir: 0 };
-  console.log(config.alignments);
-  let codeCnt = 0;
   for (const codeword of message) {
-    codeCnt++;
     for (let i = 7; i >= 0; i--) {
-      if (codeCnt === 17) {
-        console.log(position);
-      }
       const bit = (codeword >>> i) & 0x1;
       if (bit) {
         setBit(position.x, position.y, config.bits);
